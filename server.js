@@ -10,6 +10,7 @@ var crypto = require('crypto');
 var port = process.env.C9_PORT;
 //Für Lokale installation
 //var port = 1337;
+console.log('System started on Port: ' + port);
 
 var server = express.createServer();
 var io = socketio.listen(server);
@@ -22,6 +23,7 @@ server.get('/', function (req, res) {
   res.sendfile(__dirname + '/public/index.html');
 });
 
+server.use(express.static(__dirname + '/public'));
 
 io.sockets.on('connection', function(client) {
 	var current_date = (new Date()).valueOf().toString();
