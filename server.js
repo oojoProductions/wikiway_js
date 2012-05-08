@@ -6,23 +6,20 @@ var crypto = require('crypto');
 // includes
 //var test = require('./models/game.js');
 
-//Für Cloud9
+//Port for Cloud9
 var port = process.env.C9_PORT;
-//Für Lokale installation
+//Local installation
 //var port = 1337;
+
 console.log('System started on Port: ' + port);
 
 var server = express.createServer();
 var io = socketio.listen(server);
 
+//Array with open Games
 var games = new Array();
 
-
-
-server.get('/', function (req, res) {
-  res.sendfile(__dirname + '/public/index.html');
-});
-
+//Serve files in public/ folder
 server.use(express.static(__dirname + '/public'));
 
 io.sockets.on('connection', function(client) {
@@ -138,7 +135,7 @@ io.sockets.on('connection', function(client) {
 				}
 				
 			}else{
-				client.emit('chat', 'Diese Seite ist nicht verf&auml;gbar.');
+				client.emit('chat', 'Diese Seite ist nicht verf&uuml;gbar.');
 			}
 			client.emit('updateContent', bodycontent);
 			client.emit('jqinit');
