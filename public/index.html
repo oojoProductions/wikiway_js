@@ -1,50 +1,14 @@
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script type="text/javascript">google.load("jquery", "1.4.4");</script>
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-<link rel="stylesheet" href="http://schnegg.biz/sandbox/wikicontent/css/style1.css" type="text/css" media="all" />
-<link rel="stylesheet" href="http://schnegg.biz/sandbox/wikicontent/css/style2.css" type="text/css" media="all" />
+
+<link rel="stylesheet" href="./style1.css" type="text/css" media="all" />
+<link rel="stylesheet" href="./style2.css" type="text/css" media="all" />
+<script type="text/javascript" src="./client.js"></script>
+
 <script type="text/javascript" src="http://api.schnegg.biz/jqueryplugins/jgrowl/jgrowl.js"></script>
 <link rel="stylesheet" type="text/css" href="http://api.schnegg.biz/jqueryplugins/jgrowl/jgrowl.css" />
-<script>
-$(function() {
-	var socket = io.connect();
-	
-	//socket.emit('updateContent');
-	socket.emit('startgame', '');
 
-	socket.on('disconnect', function(){
-		console.log('disconnect');
-	});
-		
-	socket.on('updateContent', function(msg) {
-		document.getElementById('wikiwaycontent').innerHTML = msg;
-	});
-	
-	socket.on('jqinit', function() {
-		$("a").click(function(e){
-			e.preventDefault();
-			var page = $(this).attr("load");
-			socket.emit('startgame', page);
-		});
-	});
-	
-	socket.on('updateInfobar', function(html) {
-		document.getElementById('infobar').innerHTML = html;
-	});
-		
-	$('#chatbutton').click(function() {
-		var message = $('#message');
-		socket.emit('chat', message.val());
-		message.attr('value', '');
-	});
-	
-	socket.on('chat', function(msg) {
-		$.jGrowl(msg);
-		//document.getElementById('chatText').innerHTML += '<p>'+msg+'</p>';
-	});
-
-});
-</script>
 <div id="infobar">
 	<p class="infoTitle" >Funktionen</p>
 </div>

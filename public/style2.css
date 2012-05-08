@@ -1,0 +1,46 @@
+#infobarplaceholder{
+    float: right;
+	width:17%;
+}
+
+#infobar{
+	position: fixed;
+	right: 0px;
+	top: 50px;
+	width: 15%;
+}
+
+#chatbar{
+	position: fixed;
+	right: 0px;
+	top: 150px;
+	width: 15%;
+}
+
+
+#infobar p,ul{
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+#infobar li{
+	list-style-type: none;
+}
+
+.infoTitle{
+	font-weight: bold ! important;
+}
+
+
+#wikiwaycontent{
+	padding:5px;
+	float:left;
+	width:83%;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-right-color: grey;	
+}
