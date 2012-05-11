@@ -1,4 +1,4 @@
-/*
+﻿/*
 *	wikiway
 *	Authors: Andrin Schnegg (andrin[at]schnegg.biz),
 *			 Sebastian Widmer (widmer.sebastian[at]gmail.com)
@@ -9,6 +9,8 @@
 //Includes
 var express = require('express');
 var socketio = require('socket.io');
+//Include Main Game Functions
+var game = require('./game.js');
 
 //Port for Game
 var port = 1337;
@@ -28,8 +30,8 @@ io.sockets.on('connection', function(client) {
 	//Client loads Webpage
 	client.on('init', function() {
         //Write the Content
-		client.emit('updateContent', "Hallo Welt!");
-		client.emit('jGrowl', "Hallo Welt!", 0);
+		client.emit('updateContent', game.listGames);
+		client.emit('jGrowl', 'Hallo Welt!', 0);
     });
 
     client.on('disconnect', function() {

@@ -1,4 +1,4 @@
-$(function() {
+﻿$(function() {
     var socket = io.connect();
 	
 	// Server methodes
@@ -15,7 +15,7 @@ $(function() {
 			// system message
 			case 0:
 				header = 'Systemmeldung';
-				image = 'sytemmessage.png';
+				image = 'systemmessage.png';
 				break;
 			// system error
 			case 1:
@@ -26,7 +26,7 @@ $(function() {
 				header = 'Spielinfo';
 				break;				
 		}
-		jGrowlTheme('mono', header, msg, './img/'+image);
+		jGrowlTheme('mono', header, msg, "./img/" + image);
 	});
 	
 	// Userinput methodes
