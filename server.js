@@ -29,6 +29,7 @@ io.sockets.on('connection', function(client) {
 	client.on('init', function() {
         //Write the Content
 		client.emit('updateContent', "Hallo Welt!");
+		client.emit('jGrowl', "Hallo Welt!", 0);
     });
 
     client.on('disconnect', function() {
