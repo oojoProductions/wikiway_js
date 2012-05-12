@@ -19,8 +19,12 @@ games[1]["startArticle"] = "Aldi";
 games[1]["endArticle"] = "Lidl";
 
 //Make New Game
-exports.createGame = function(startArticle, endActicle){
-	return "";
+exports.newGame = function(startArticle, endArticle){
+	//If Articles not defined return false
+	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "") return false;
+	//Save Game in Array an return true
+	games.push(new Object({startArticle: startArticle, endArticle: endArticle}));
+	return true;
 };
 
 //Join Game

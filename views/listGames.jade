@@ -1,8 +1,8 @@
 h1 Liste der aktiven Spiele - 
-	a(href="#") Neues Spiel!
+	a(href="#", action="newGame") Neues Spiel!
 - if (games.length)
 	- each game, i in games
-		a(href="#", game="#{i}") Von #{game.startArticle} nach #{game.endArticle}
+		a(href="#", action="joinGame", game="#{i}") Von #{game.startArticle} nach #{game.endArticle}
 		br
 - else
 	p Keine aktiven Spiele! :(

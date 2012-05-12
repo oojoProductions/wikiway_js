@@ -41,6 +41,21 @@ io.sockets.on('connection', function(client) {
 		
 		client.emit('jGrowl', 'Hallo Welt!', 0);
     });
+	
+	client.on('newGame', function(startArticle, endArticle) {
+		if (game.newGame(startArticle, endArticle))
+		{
+			templ.render('listGames', {games: game.listGames()}, function (data){
+				client.emit('updateContent', data);
+			});
+		}
+		else
+		{
+			templ.render('newGame', null, function (data){
+				client.emit('updateContent', data);
+			});
+		}
+	});
 
     client.on('disconnect', function() {
         console.log('disconnect');

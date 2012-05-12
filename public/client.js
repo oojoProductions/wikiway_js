@@ -1,4 +1,4 @@
-﻿$(function() {
+﻿$(document).ready(function() {
     var socket = io.connect();
 	
 	// Server methodes
@@ -6,6 +6,27 @@
 	
 	socket.on('updateContent', function(msg) {
 		document.getElementById('wikiwayContent').innerHTML = msg;
+		
+		// Userinput methodes
+		//----------------------------------------
+		$("a").click(function(e){
+			e.preventDefault();
+			switch($(this).attr("action")){
+				//Enter Game
+				case "joinGame":
+					socket.emit('joinGame');
+				//New Game
+				case "newGame":
+					//socket.emit('newGame', "Google", "Bing_(Suchmaschine)");
+					socket.emit('newGame');
+			}
+		});
+		//Get Control over Submitbutton
+		$("form").submit(function () {
+			socket.emit('newGame', $('#text-startArticle').val(), $('#text-endArticle').val());
+			return false;
+		});
+		
 	});
 	
 	socket.on('jGrowl', function(msg, type) {
@@ -29,11 +50,9 @@
 		jGrowlTheme('mono', header, msg, "./img/" + image);
 	});
 	
-	// Userinput methodes
-	//----------------------------------------
-	
-	//Init when loadad the first time
-	$(document).ready(function() {
-		socket.emit('init');
-	});
+	//Init when loaded the first time
+	socket.emit('init');
 });
+
+
+
