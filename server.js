@@ -9,8 +9,12 @@
 //Includes
 var express = require('express');
 var socketio = require('socket.io');
+//Filesystem
+var fs = require('fs');
 //Include Main Game Functions
 var game = require('./game.js');
+//Imclude template functions
+var templ = require('./templ.js');
 
 //Port for Game
 var port = 1337;
@@ -29,8 +33,11 @@ server.use(express.static(__dirname + '/public'));
 io.sockets.on('connection', function(client) {
 	//Client loads Webpage
 	client.on('init', function() {
-        //Write the Content
-		client.emit('updateContent', game.listGames);
+        //Write new Game template
+		templ.render('newGame', 'utf8', function (data){
+			client.emit('updateContent', data);
+		});
+		
 		client.emit('jGrowl', 'Hallo Welt!', 0);
     });
 
