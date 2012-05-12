@@ -7,14 +7,13 @@
 */
 
 //Includes
-var express = require('express');
-var socketio = require('socket.io');
-//Filesystem
-var fs = require('fs');
+var express = require('express'),
+	socketio = require('socket.io');
+
 //Include Main Game Functions
-var game = require('./game.js');
-//Imclude template functions
-var templ = require('./templ.js');
+var game = require('./modules/game.js');
+//Include template functions
+var templ = require('./modules/templ.js');
 
 //Port for Game
 var port = 1337;
