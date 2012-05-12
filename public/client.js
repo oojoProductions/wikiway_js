@@ -1,38 +1,61 @@
-$(function() {
+﻿$(document).ready(function() {
     var socket = io.connect();
 	
-	//socket.emit('updateContent');
-	socket.emit('startgame', '');
-
-	socket.on('disconnect', function(){
-		console.log('disconnect');
-	});
-		
-	socket.on('updateContent', function(msg) {
-		document.getElementById('wikiwaycontent').innerHTML = msg;
-	});
+	// Server methodes
+	//----------------------------------------
 	
-	socket.on('jqinit', function() {
+	socket.on('updateContent', function(data) {
+		document.getElementById('wikiwayContent').innerHTML = data;
+		
+		// Userinput methodes
+		//----------------------------------------
 		$("a").click(function(e){
 			e.preventDefault();
-			var page = $(this).attr("load");
-			socket.emit('startgame', page);
+			switch($(this).attr("action")){
+				//Enter Game
+				case "joinGame":
+					socket.emit('joinGame', $(this).attr("game"));
+					break;
+				//New Game
+				case "newGame":
+					socket.emit('newGame');
+					break;
+				case "next":
+					socket.emit('next', $(this).attr("art"))
+			}
 		});
-	});
-	
-	socket.on('updateInfobar', function(html) {
-		document.getElementById('infobar').innerHTML = html;
-	});
+		//Get Control over Submitbutton
+		$("form").submit(function () {
+			socket.emit('newGame', $('#text-startArticle').val(), $('#text-endArticle').val());
+			return false;
+		});
 		
-	$('#chatbutton').click(function() {
-		var message = $('#message');
-		socket.emit('chat', message.val());
-		message.attr('value', '');
 	});
 	
-	socket.on('chat', function(msg) {
-		$.jGrowl(msg);
-		//document.getElementById('chatText').innerHTML += '<p>'+msg+'</p>';
+	socket.on('jGrowl', function(msg, type) {
+		var header = '';
+		var image = '';
+		switch(type){
+			// system message
+			case 0:
+				header = 'Systemmeldung';
+				image = 'systemmessage.png';
+				break;
+			// system error
+			case 1:
+				header = 'Systemfehler';
+				break;
+			// game info
+			case 2:
+				header = 'Spielinfo';
+				break;				
+		}
+		jGrowlTheme('mono', header, msg, "./img/" + image);
 	});
-
+	
+	//Init when loaded the first time
+	socket.emit('init');
 });
+
+
+
