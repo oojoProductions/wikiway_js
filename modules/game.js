@@ -5,6 +5,8 @@
 *	Version: Experimental
 *	Datum:   11.05.2012
 */
+//Needs Request to work
+var request = require('request');
 
 //Array where all the Games are saved
 var games = new Array();
@@ -34,8 +36,13 @@ exports.joinGame = function(client, gameId, callback){
 		client.set('game', null, callback);
 	}
 	else
-	{
-		client.set('game', gameId, callback);
+	{	
+		//Create Game Object for User
+		gameObject = new Object();
+		gameObject['id'] = gameId;
+		gameObject['articleHistory'] = Array();
+		gameObject['links'] = Array();
+		client.set('game', gameObject, callback);
 	}
 };
 
@@ -52,10 +59,70 @@ exports.getGame = function(gameId){
 
 //Checks if user is in Game
 exports.checkUser = function(client){
-	return 0;
+	return false;
 };
 
 //Next Step for User
-exports.next = function(client){
-	return 0;
+exports.next = function(client, callback){
+	//Get User specific stuff
+	client.get('game', function(err, gameObject){
+		//Get Startarticle
+		getWikiContent(games[gameObject.id].startArticle, function(bodycontent, links){
+			//Set Links to use Later
+			gameObject.links = links;
+			//Set Article History
+			//gameObject.articleHistory.push();
+			//Save the whole thing in the User Session
+			client.set('game', gameObject,function(){
+				callback(bodycontent);
+			});
+		});
+	});
+};
+
+//Private function get Wikipedia Article
+function getWikiContent(article, callback){
+	request("http://de.wikipedia.org/wiki/"+article, function (error, response, body) {
+		//Is Page valid?
+		if (!error && response.statusCode == 200) {
+			var regex = '<!-- bodyContent -->((.|\n|\r)*)<!-- /bodycontent -->';
+			var bodycontent = body.match(regex);
+			bodycontent = bodycontent[1];
+			var linkRegex = new RegExp('<a href="/wiki/(.*?)".*?>(.*?)</a>',"g");
+
+			var links = bodycontent.match(linkRegex, "g");
+
+			for(var i=0; i<links.length; i++) {
+				var value = links[i];
+				var url = value.match("href=\"(.*?)\"");
+				bodycontent = bodycontent.replace(url[1], "#\" load=\""+i);
+			}
+
+			// remove edit links
+			var editRegex = new RegExp('<span class="editsection">.*?</span>',"g");
+			var edits = bodycontent.match(editRegex, "g");
+			if (!(edits == null))
+			{
+				for(var i=0; i<edits.length; i++) {
+					edit = edits[i];
+					bodycontent = bodycontent.replace(edit, "");
+				}
+			}
+			// remove all external links
+			var extlinkRegex = new RegExp('<a.*?href=".*?</a>',"g");
+			var extlinks = bodycontent.match(extlinkRegex, "g");
+			for(var i=0; i<extlinks.length; i++) {
+				var extlink = extlinks[i];
+				if(!extlink.match('.*?href=".*?".*?load=.*?|.*?class="image".*?|.*?href="#.*?')){
+					var text = extlink.match(">(.*?)<");
+					bodycontent = bodycontent.replace(extlink, text[1]);
+				}
+			}
+			
+			callback(bodycontent, links);
+		}else{
+			console.log('failed to load wikipedia article: '+article);
+			callback(null, null);
+		}
+	});
 };

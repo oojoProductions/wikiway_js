@@ -59,11 +59,22 @@ io.sockets.on('connection', function(client) {
 	});
 	
 	client.on('joinGame', function(gameId) {
-		console.log('joinGame');
 		game.joinGame(client, gameId, function(){
-			client.get('game', function(err, data){
-				console.log("Client joined Game: "+game.getGame(data).startArticle+" - "+game.getGame(data).endArticle);
+			//client.get('game', function(err, data){
+			//	console.log("Client joined Game: "+game.getGame(data).startArticle+" - "+game.getGame(data).endArticle);
+			//});
+			//Goto first article
+			game.next(client, function(bodycontent){
+				client.emit('updateContent', bodycontent);
 			});
+		});
+	});
+	
+	//Next Article
+	client.on('next', function(id) {
+		console.log('next');
+		game.next(client, function(bodycontent){
+			client.emit('updateContent', data);
 		});
 	});
 	
