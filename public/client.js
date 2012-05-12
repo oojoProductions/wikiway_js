@@ -4,8 +4,8 @@
 	// Server methodes
 	//----------------------------------------
 	
-	socket.on('updateContent', function(msg) {
-		document.getElementById('wikiwayContent').innerHTML = msg;
+	socket.on('updateContent', function(data) {
+		document.getElementById('wikiwayContent').innerHTML = data;
 		
 		// Userinput methodes
 		//----------------------------------------
@@ -18,8 +18,10 @@
 					break;
 				//New Game
 				case "newGame":
-					//socket.emit('newGame', "Google", "Bing_(Suchmaschine)");
 					socket.emit('newGame');
+					break;
+				case "next":
+					socket.emit('next', $(this).attr("art"))
 			}
 		});
 		//Get Control over Submitbutton

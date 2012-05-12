@@ -63,11 +63,21 @@ exports.checkUser = function(client){
 };
 
 //Next Step for User
-exports.next = function(client, callback){
+exports.next = function(client, articleId, callback){
 	//Get User specific stuff
 	client.get('game', function(err, gameObject){
-		//Get Startarticle
-		getWikiContent(games[gameObject.id].startArticle, function(bodycontent, links){
+		//Get next Article
+		var article;
+		if (gameObject.links && articleId != null)
+		{
+			article = getArticleFromLinkArray(gameObject.links, articleId);
+		}
+		else
+		{
+			article = games[gameObject.id].startArticle;
+		}
+		//Get requested article
+		getWikiContent(article, function(bodycontent, links){
 			//Set Links to use Later
 			gameObject.links = links;
 			//Set Article History
@@ -80,6 +90,13 @@ exports.next = function(client, callback){
 	});
 };
 
+//Private Function to get full article from id
+function getArticleFromLinkArray(links, id){
+	var article = links[id];
+	article = article.match("href=\"/wiki/(.*?)\"");
+	article = article[1];
+	return article;
+}
 //Private function get Wikipedia Article
 function getWikiContent(article, callback){
 	request("http://de.wikipedia.org/wiki/"+article, function (error, response, body) {
@@ -89,13 +106,12 @@ function getWikiContent(article, callback){
 			var bodycontent = body.match(regex);
 			bodycontent = bodycontent[1];
 			var linkRegex = new RegExp('<a href="/wiki/(.*?)".*?>(.*?)</a>',"g");
-
+			//Build Link Array
 			var links = bodycontent.match(linkRegex, "g");
-
 			for(var i=0; i<links.length; i++) {
 				var value = links[i];
 				var url = value.match("href=\"(.*?)\"");
-				bodycontent = bodycontent.replace(url[1], "#\" load=\""+i);
+				bodycontent = bodycontent.replace(url[1], "#\" action=\"next\" art=\""+i);
 			}
 
 			// remove edit links

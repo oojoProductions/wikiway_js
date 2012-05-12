@@ -60,21 +60,18 @@ io.sockets.on('connection', function(client) {
 	
 	client.on('joinGame', function(gameId) {
 		game.joinGame(client, gameId, function(){
-			//client.get('game', function(err, data){
-			//	console.log("Client joined Game: "+game.getGame(data).startArticle+" - "+game.getGame(data).endArticle);
-			//});
 			//Goto first article
-			game.next(client, function(bodycontent){
-				client.emit('updateContent', bodycontent);
+			game.next(client, null, function(wiki){
+				client.emit('updateContent', wiki);
 			});
 		});
 	});
 	
 	//Next Article
-	client.on('next', function(id) {
+	client.on('next', function(articleId) {
 		console.log('next');
-		game.next(client, function(bodycontent){
-			client.emit('updateContent', data);
+		game.next(client, articleId, function(wiki){
+			client.emit('updateContent', wiki);
 		});
 	});
 	
