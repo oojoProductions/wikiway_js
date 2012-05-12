@@ -40,7 +40,7 @@ exports.joinGame = function(client, gameId, callback){
 		//Create Game Object for User
 		gameObject = new Object();
 		gameObject['id'] = gameId;
-		gameObject['articleHistory'] = Array();
+		gameObject['history'] = Array();
 		gameObject['links'] = Array();
 		client.set('game', gameObject, callback);
 	}
@@ -58,8 +58,17 @@ exports.getGame = function(gameId){
 
 
 //Checks if user is in Game
-exports.checkUser = function(client){
-	return false;
+exports.inGame = function(client, callback){
+	client.get('game', function(err, gameObject){
+		if (gameObject == null)
+		{
+			callback(false);
+		}
+		else
+		{
+			callback(true);
+		}
+	});
 };
 
 //Next Step for User
@@ -74,14 +83,21 @@ exports.next = function(client, articleId, callback){
 		}
 		else
 		{
-			article = games[gameObject.id].startArticle;
+			if (gameObject.history.lenght)
+			{
+				article = gameObject.history[gameObject.history.lenght-1];
+			}
+			else
+			{
+				article = games[gameObject.id].startArticle;
+			}
 		}
 		//Get requested article
 		getWikiContent(article, function(bodycontent, links){
 			//Set Links to use Later
 			gameObject.links = links;
 			//Set Article History
-			//gameObject.articleHistory.push();
+			gameObject.history.push(article);
 			//Save the whole thing in the User Session
 			client.set('game', gameObject,function(){
 				callback(bodycontent);

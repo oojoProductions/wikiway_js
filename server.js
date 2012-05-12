@@ -30,16 +30,24 @@ io.sockets.on('connection', function(client) {
 	//Client loads Webpage
 	client.on('init', function() {
         //Read new Game template
-		/*
-		templ.render('newGame', null, function (data){
-			client.emit('updateContent', data);
+		game.inGame(client, function (inGame){
+			//If user inGame then load page else render List of Games
+			if (inGame)
+			{
+				game.next(client, null, function(wiki){
+					client.emit('updateContent', wiki);
+				});
+			}
+			else
+			{
+				templ.render('listGames', {games: game.listGames()}, function (data){
+					console.log('init from browser');
+					client.emit('updateContent', data);
+				});
+			}
 		});
-		*/
-		templ.render('listGames', {games: game.listGames()}, function (data){
-			console.log('init from browser');
-			client.emit('updateContent', data);
-		});
-		
+
+		//Test jGrowl
 		client.emit('jGrowl', 'Hallo Welt!', 0);
     });
 	
