@@ -36,6 +36,7 @@ io.sockets.on('connection', function(client) {
 		});
 		*/
 		templ.render('listGames', {games: game.listGames()}, function (data){
+			console.log('init from browser');
 			client.emit('updateContent', data);
 		});
 		
@@ -56,7 +57,16 @@ io.sockets.on('connection', function(client) {
 			});
 		}
 	});
-
+	
+	client.on('joinGame', function(gameId) {
+		console.log('joinGame');
+		game.joinGame(client, gameId, function(){
+			client.get('game', function(err, data){
+				console.log("Client joined Game: "+game.getGame(data).startArticle+" - "+game.getGame(data).endArticle);
+			});
+		});
+	});
+	
     client.on('disconnect', function() {
         console.log('disconnect');
     });

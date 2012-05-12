@@ -22,20 +22,33 @@ games[1]["endArticle"] = "Lidl";
 exports.newGame = function(startArticle, endArticle){
 	//If Articles not defined return false
 	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "") return false;
-	//Save Game in Array an return true
+	//Save Game in Array and return true
 	games.push(new Object({startArticle: startArticle, endArticle: endArticle}));
 	return true;
 };
 
 //Join Game
-exports.joinGame = function(gameId){
-	return 0;
+exports.joinGame = function(client, gameId, callback){
+	if (!(gameId in games))
+	{
+		client.set('game', null, callback);
+	}
+	else
+	{
+		client.set('game', gameId, callback);
+	}
 };
 
 //List all Games
 exports.listGames = function(){
 	return games;
 };
+//Show single Game
+exports.getGame = function(gameId){
+	if (gameId in games) return games[gameId];
+	return null;
+};
+
 
 //Checks if user is in Game
 exports.checkUser = function(client){
@@ -43,6 +56,6 @@ exports.checkUser = function(client){
 };
 
 //Next Step for User
-exports.checkUser = function(client){
+exports.next = function(client){
 	return 0;
 };

@@ -14,7 +14,8 @@
 			switch($(this).attr("action")){
 				//Enter Game
 				case "joinGame":
-					socket.emit('joinGame');
+					socket.emit('joinGame', $(this).attr("game"));
+					break;
 				//New Game
 				case "newGame":
 					//socket.emit('newGame', "Google", "Bing_(Suchmaschine)");
