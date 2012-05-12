@@ -32,7 +32,7 @@ server.use(express.static(__dirname + '/public'));
 io.sockets.on('connection', function(client) {
 	//Client loads Webpage
 	client.on('init', function() {
-        //Write new Game template
+        //Read new Game template
 		templ.render('newGame', 'utf8', function (data){
 			client.emit('updateContent', data);
 		});
