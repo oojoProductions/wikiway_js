@@ -21,12 +21,15 @@ var port = 1337;
 //Define Server
 var server = express.createServer();
 var io = socketio.listen(server);
+//Less log messages from socket.io
+io.set('log level', 1);
 //Serve files in public/ folder
 server.use(express.static(__dirname + '/public'));
 
 //Socket IO logic
 //--------------------------------
 io.sockets.on('connection', function(client) {
+	console.log('client - connect');
 	//Client loads Webpage
 	client.on('init', function() {
         //Read new Game template
@@ -41,7 +44,7 @@ io.sockets.on('connection', function(client) {
 			else
 			{
 				templ.render('listGames', {games: game.listGames()}, function (data){
-					console.log('init from browser');
+					console.log('client - init from browser');
 					client.emit('updateContent', data);
 				});
 			}
@@ -77,14 +80,14 @@ io.sockets.on('connection', function(client) {
 	
 	//Next Article
 	client.on('next', function(articleId) {
-		console.log('next');
+		console.log('client - next article');
 		game.next(client, articleId, function(wiki){
 			client.emit('updateContent', wiki);
 		});
 	});
 	
     client.on('disconnect', function() {
-        console.log('disconnect');
+        console.log('client - disconnect');
     });
 });
 //--------------------------------

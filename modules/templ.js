@@ -21,9 +21,6 @@ exports.render = function(file, locals, callback){
 		//Compile template
 		layout = jade.compile(data, { filename: file });
 		//Call callback with compiled layout
-		
-		console.log(locals);
-		
 		if (callback != null){
 			callback(layout(locals));
 		};

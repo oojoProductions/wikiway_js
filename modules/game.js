@@ -153,7 +153,7 @@ function getWikiContent(article, callback){
 			
 			callback(bodycontent, links);
 		}else{
-			console.log('failed to load wikipedia article: '+article);
+			console.log('game - failed to load wikipedia article: '+article);
 			callback(null, null);
 		}
 	});
