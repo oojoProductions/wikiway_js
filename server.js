@@ -24,16 +24,18 @@ var io = socketio.listen(server);
 //Serve files in public/ folder
 server.use(express.static(__dirname + '/public'));
 
-//Array with open Games
-//var games = new Array();
-
 //Socket IO logic
 //--------------------------------
 io.sockets.on('connection', function(client) {
 	//Client loads Webpage
 	client.on('init', function() {
         //Read new Game template
-		templ.render('newGame', 'utf8', function (data){
+		/*
+		templ.render('newGame', null, function (data){
+			client.emit('updateContent', data);
+		});
+		*/
+		templ.render('listGames', {games: game.listGames()}, function (data){
 			client.emit('updateContent', data);
 		});
 		

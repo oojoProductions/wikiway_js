@@ -19,10 +19,13 @@ exports.render = function(file, locals, callback){
 		//throw error
 		if (err) throw err;
 		//Compile template
-		layout = jade.compile(data, { filename: file, locals: locals });
+		layout = jade.compile(data, { filename: file });
 		//Call callback with compiled layout
+		
+		console.log(locals);
+		
 		if (callback != null){
-			callback(layout());
+			callback(layout(locals));
 		};
 	});
 };

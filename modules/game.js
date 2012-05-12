@@ -9,6 +9,15 @@
 //Array where all the Games are saved
 var games = new Array();
 
+//Fill Games array for debug
+games[0] = new Object();
+games[0]["startArticle"] = "Coop";
+games[0]["endArticle"] = "Migros";
+
+games[1] = new Object();
+games[1]["startArticle"] = "Aldi";
+games[1]["endArticle"] = "Lidl";
+
 //Make New Game
 exports.createGame = function(startArticle, endActicle){
 	return "";
@@ -21,7 +30,7 @@ exports.joinGame = function(gameId){
 
 //List all Games
 exports.listGames = function(){
-	return "Liste der Games...";
+	return games;
 };
 
 //Checks if user is in Game
