@@ -84,10 +84,12 @@ exports.next = function(client, articleId, callback){
 		var article;
 		if (gameObject.links && articleId != null)
 		{
+			//Normal case, gets article from link array
 			article = getArticleFromLinkArray(gameObject.links, articleId);
 		}
 		else
 		{
+			//Use startArticle if there is no history (user is new in game)
 			if (gameObject.history.lenght)
 			{
 				article = gameObject.history[gameObject.history.lenght-1];
@@ -97,7 +99,13 @@ exports.next = function(client, articleId, callback){
 				article = games[gameObject.id].startArticle;
 			}
 		}
-		//Get requested article
+		//Check if user wins the game
+		if (article === games[gameObject.id].endArticle)
+		{
+			//Debug
+			console.log('game - end article found: '+article);
+		}
+		//Get requested article from Wikipedia
 		getWikiContent(article, function(bodycontent, links){
 			//Set Links to use Later
 			gameObject.links = links;
