@@ -8,6 +8,9 @@
 //Needs Request to work
 var request = require('request');
 
+//require server.js
+var server = require('./../server.js');
+
 //Array where all the Games are saved
 var games = new Array();
 
@@ -98,6 +101,8 @@ exports.next = function(client, articleId, callback){
 			gameObject.links = links;
 			//Set Article History
 			gameObject.history.push(article);
+			//inform all players about article (debug)
+			server.broadcastMsg("Gegner auf: "+article);
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
 				callback(bodycontent);

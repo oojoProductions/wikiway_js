@@ -28,8 +28,14 @@ server.use(express.static(__dirname + '/public'));
 
 //Socket IO logic
 //--------------------------------
+//Save how many clients are connected
+var clientCount = 0;
+//On connection
 io.sockets.on('connection', function(client) {
-	console.log('client - connect');
+	//+1 client
+	++clientCount;
+	//log
+	console.log('client - connected');
 	//Client loads Webpage
 	client.on('init', function() {
 		console.log('client - init from browser');
@@ -49,10 +55,9 @@ io.sockets.on('connection', function(client) {
 					client.emit('updateContent', data);
 				});
 			}
+			//show welcome message
+			client.emit('growl', "Willkommen! "+clientCount+ " Spieler verbunden.", 0);
 		});
-
-		//Test for jGrowl
-		client.emit('jGrowl', 'Hallo Welt!', 0);
     });
 	//List all Games
 	client.on('listGames', function() {
@@ -96,9 +101,18 @@ io.sockets.on('connection', function(client) {
 	});
 	
     client.on('disconnect', function() {
-        console.log('client - disconnect');
+		//-1 client
+		--clientCount;
+		//log
+        console.log('client - disconnected');
     });
 });
+
+//Server Broadcast a message
+exports.broadcastMsg = function (msg) {
+	console.log("server - broadcast: "+msg);
+	io.sockets.emit('growl', msg, 2);
+};
 //--------------------------------
 
 //Start the whole thing

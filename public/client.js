@@ -36,7 +36,7 @@
 		
 	});
 	
-	socket.on('jGrowl', function(msg, type) {
+	socket.on('growl', function(msg, type) {
 		var header = '';
 		var image = '';
 		switch(type){
@@ -52,6 +52,7 @@
 			// game info
 			case 2:
 				header = 'Spielinfo';
+				image = 'systemmessage.png';
 				break;				
 		}
 		jGrowlTheme('mono', header, msg, "./img/" + image);
