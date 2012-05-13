@@ -12,6 +12,10 @@
 		$("a").click(function(e){
 			e.preventDefault();
 			switch($(this).attr("action")){
+				//List Games
+				case "listGames":
+					socket.emit('listGames');
+					break;
 				//Enter Game
 				case "joinGame":
 					socket.emit('joinGame', $(this).attr("game"));

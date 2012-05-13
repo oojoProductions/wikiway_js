@@ -54,6 +54,12 @@ io.sockets.on('connection', function(client) {
 		//Test for jGrowl
 		client.emit('jGrowl', 'Hallo Welt!', 0);
     });
+	//List all Games
+	client.on('listGames', function() {
+		templ.render('listGames', {games: game.listGames()}, function (data){
+			client.emit('updateContent', data);
+		});
+	});
 	
 	//Client creates new game or show form if start and endarticle == null
 	client.on('newGame', function(startArticle, endArticle) {
