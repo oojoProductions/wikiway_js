@@ -98,7 +98,7 @@ exports.next = function(client, articleId, callback){
 			gameObject.links = links;
 			//Set Article History
 			gameObject.history.push(article);
-			//Save the whole thing in the User Session
+			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
 				callback(bodycontent);
 			});
@@ -106,14 +106,14 @@ exports.next = function(client, articleId, callback){
 	});
 };
 
-//Private Function to get full article from id
+//Private function to get full article from id
 function getArticleFromLinkArray(links, id){
 	var article = links[id];
 	article = article.match("href=\"/wiki/(.*?)\"");
 	article = article[1];
 	return article;
 }
-//Private function get Wikipedia Article
+//Private function get Wikipedia article
 function getWikiContent(article, callback){
 	request("http://de.wikipedia.org/wiki/"+article, function (error, response, body) {
 		//Is Page valid?

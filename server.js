@@ -6,11 +6,11 @@
 *	Datum:   11.05.2012
 */
 
-//Includes
+//wikiway uses express and socket.io
 var express = require('express'),
 	socketio = require('socket.io');
 
-//Include Main Game Functions
+//Include main game functions
 var game = require('./modules/game.js');
 //Include template functions
 var templ = require('./modules/templ.js');
@@ -32,28 +32,30 @@ io.sockets.on('connection', function(client) {
 	console.log('client - connect');
 	//Client loads Webpage
 	client.on('init', function() {
-        //Read new Game template
+		console.log('client - init from browser');
+        //Check if user is in game
 		game.inGame(client, function (inGame){
-			//If user inGame then load page else render List of Games
 			if (inGame)
-			{
+			{	
+				//If user is in game serve last article
 				game.next(client, null, function(wiki){
 					client.emit('updateContent', wiki);
 				});
 			}
 			else
-			{
+			{	
+				//If user is not in game serve list of games
 				templ.render('listGames', {games: game.listGames()}, function (data){
-					console.log('client - init from browser');
 					client.emit('updateContent', data);
 				});
 			}
 		});
 
-		//Test jGrowl
+		//Test for jGrowl
 		client.emit('jGrowl', 'Hallo Welt!', 0);
     });
 	
+	//Client creates new game or show form if start and endarticle == null
 	client.on('newGame', function(startArticle, endArticle) {
 		if (game.newGame(startArticle, endArticle))
 		{
@@ -69,6 +71,7 @@ io.sockets.on('connection', function(client) {
 		}
 	});
 	
+	//Client joins game
 	client.on('joinGame', function(gameId) {
 		game.joinGame(client, gameId, function(){
 			//Goto first article
@@ -78,7 +81,7 @@ io.sockets.on('connection', function(client) {
 		});
 	});
 	
-	//Next Article
+	//Next article
 	client.on('next', function(articleId) {
 		console.log('client - next article');
 		game.next(client, articleId, function(wiki){
