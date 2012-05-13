@@ -1,0 +1,20 @@
+!!! 5
+html
+	head
+		title wikiway_js
+		//jQuery
+		script(type="text/javascript", src="https://www.google.com/jsapi")
+		script(type="text/javascript") google.load("jquery", "1");
+		//Socket IO
+		script(type="text/javascript", src="/socket.io/socket.io.js")
+		//Custom Styles and Stuff
+		link(rel="stylesheet", href="./css/style1.css", type="text/css", media="all")
+		link(rel="stylesheet", href="./css/style2.css", type="text/css", media="all")
+		//Client
+		script(type="text/javascript", src="/js/client.js")
+		//jGrowl
+		script(type="text/javascript", src="http://api.schnegg.biz/jqueryplugins/jgrowl/jgrowl.js")
+		script(type="text/javascript", src="./js/jGrowlTheme.js")
+		link(rel="stylesheet", href="http://api.schnegg.biz/jqueryplugins/jgrowl/jgrowl.css", type="text/css", media="all")
+	body
+		div#wikiwayContent

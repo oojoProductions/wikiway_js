@@ -25,6 +25,14 @@ var io = socketio.listen(server);
 io.set('log level', 1);
 //Serve files in public/ folder
 server.use(express.static(__dirname + '/public'));
+//Serve index
+server.get('/', function(req, res){
+	//Render index
+	templ.render('index', null, function (data){
+		res.send(data);
+	});
+});
+
 
 //Socket IO logic
 //--------------------------------
