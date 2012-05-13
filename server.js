@@ -94,8 +94,8 @@ io.sockets.on('connection', function(client) {
 	client.on('joinGame', function(gameId) {
 		game.joinGame(client, gameId, function(){
 			//Goto first article
-			game.next(client, null, function(wiki){
-				client.emit('updateContent', wiki);
+			game.next(client, null, function(win, bodycontent, history){
+				client.emit('updateContent', bodycontent);
 			});
 		});
 	});
@@ -103,8 +103,17 @@ io.sockets.on('connection', function(client) {
 	//Next article
 	client.on('next', function(articleId) {
 		console.log('client - next article');
-		game.next(client, articleId, function(wiki){
-			client.emit('updateContent', wiki);
+		game.next(client, articleId, function(win, bodycontent, history){
+			if (win)
+			{
+				templ.render('win', {history: history}, function (data){
+					client.emit('updateContent', data);
+				});
+			}
+			else
+			{
+				client.emit('updateContent', bodycontent);			
+			}
 		});
 	});
 	

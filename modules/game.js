@@ -78,6 +78,7 @@ exports.inGame = function(client, callback){
 exports.next = function(client, articleId, callback){
 	//Get User specific stuff
 	client.get('game', function(err, gameObject){
+		
 		//Check if user is in game, if not do nothing
 		if (gameObject == null) return;
 		//Get next Article
@@ -104,6 +105,9 @@ exports.next = function(client, articleId, callback){
 		{
 			//Debug
 			console.log('game - end article found: '+article);
+			gameObject.history.push(article);
+			callback(true, null, gameObject.history);
+			return;
 		}
 		//Get requested article from Wikipedia
 		getWikiContent(article, function(bodycontent, links){
@@ -115,7 +119,7 @@ exports.next = function(client, articleId, callback){
 			server.broadcastMsg("Gegner auf: "+article);
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
-				callback(bodycontent);
+				callback(false, bodycontent, gameObject.history);
 			});
 		});
 	});
