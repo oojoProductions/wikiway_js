@@ -78,6 +78,8 @@ exports.inGame = function(client, callback){
 exports.next = function(client, articleId, callback){
 	//Get User specific stuff
 	client.get('game', function(err, gameObject){
+		//Check if user is in game, if not do nothing
+		if (gameObject == null) return;
 		//Get next Article
 		var article;
 		if (gameObject.links && articleId != null)
