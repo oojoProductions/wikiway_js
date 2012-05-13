@@ -122,6 +122,7 @@ function getWikiContent(article, callback){
 			var bodycontent = body.match(regex);
 			bodycontent = bodycontent[1];
 			var linkRegex = new RegExp('<a href="/wiki/(.*?)".*?>(.*?)</a>',"g");
+			
 			//Build Link Array
 			var links = bodycontent.match(linkRegex, "g");
 			for(var i=0; i<links.length; i++) {
@@ -131,8 +132,8 @@ function getWikiContent(article, callback){
 			}
 
 			// remove edit links
-			var editRegex = new RegExp('<span class="editsection">.*?</span>',"g");
-			var edits = bodycontent.match(editRegex, "g");
+			var editsRegex = new RegExp('<span class="editsection">.*?</span>',"g");
+			var edits = bodycontent.match(editsRegex, "g");
 			if (!(edits == null))
 			{
 				for(var i=0; i<edits.length; i++) {
@@ -143,14 +144,18 @@ function getWikiContent(article, callback){
 			// remove all external links
 			var extlinkRegex = new RegExp('<a.*?href=".*?</a>',"g");
 			var extlinks = bodycontent.match(extlinkRegex, "g");
-			for(var i=0; i<extlinks.length; i++) {
-				var extlink = extlinks[i];
-				if(!extlink.match('.*?href=".*?".*?load=.*?|.*?class="image".*?|.*?href="#.*?')){
-					var text = extlink.match(">(.*?)<");
-					bodycontent = bodycontent.replace(extlink, text[1]);
+			if (!(extlinks == null))
+			{
+				for(var i=0; i<extlinks.length; i++) {
+					var extlink = extlinks[i];
+					if(!extlink.match('.*?href=".*?".*?load=.*?|.*?class="image".*?|.*?href="#.*?')){
+						var text = extlink.match(">(.*?)<");
+						bodycontent = bodycontent.replace(extlink, text[1]);
+					}
 				}
 			}
 			
+			//Call callback with the content of wikipedia and the links array
 			callback(bodycontent, links);
 		}else{
 			console.log('game - failed to load wikipedia article: '+article);
