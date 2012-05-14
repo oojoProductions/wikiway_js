@@ -103,11 +103,14 @@ io.sockets.on('connection', function(client) {
 	//Next article
 	client.on('next', function(articleId) {
 		console.log('client - next article');
-		game.next(client, articleId, function(win, bodycontent, history){
+		game.next(client, articleId, function(win, bodycontent, history, gameId){
 			if (win)
 			{
 				templ.render('win', {history: history}, function (data){
 					client.emit('updateContent', data);
+				});
+				templ.render('lose', {history: history}, function (data){
+					client.broadcast.in(gameId).emit('updateContent', data);
 				});
 			}
 			else
@@ -125,10 +128,25 @@ io.sockets.on('connection', function(client) {
     });
 });
 
-//Server Broadcast a message
-exports.broadcastMsg = function (msg) {
-	console.log("server - broadcast: "+msg);
-	io.sockets.emit('growl', msg, 2);
+//Server Broadcast a message for all users
+exports.broadcastMsgAll = function (client, msg) {
+	client.emit('growl', msg, 2);
+};
+//Server Broadcast a message for users in game
+exports.broadcastMsgGame = function (client, gameId, msg) {
+	client.broadcast.in(gameId).emit('growl', msg, 2);
+};
+//Server Broadcast content for all users
+exports.broadcastContentAll = function (client, template, locals) {
+	templ.render(template, null, function (data){
+		client.broadcast.emit('updateContent', data);
+	});
+};
+//Server Broadcast content for users in game
+exports.broadcastContentGame = function (client, gameId, template, locals) {
+	templ.render(template, null, function (data){
+		client.broadcast.in(gameId).emit('updateContent', data);
+	});
 };
 //--------------------------------
 

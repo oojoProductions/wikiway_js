@@ -45,6 +45,9 @@ exports.joinGame = function(client, gameId, callback){
 		gameObject['id'] = gameId;
 		gameObject['history'] = Array();
 		gameObject['links'] = Array();
+		//Client joins socket.io room for game
+		client.join(gameId);
+		//Set game object
 		client.set('game', gameObject, callback);
 	}
 };
@@ -106,7 +109,7 @@ exports.next = function(client, articleId, callback){
 			//Debug
 			console.log('game - end article found: '+article);
 			gameObject.history.push(article);
-			callback(true, null, gameObject.history);
+			callback(true, null, gameObject.history, gameObject.id);
 			return;
 		}
 		//Get requested article from Wikipedia
@@ -115,11 +118,11 @@ exports.next = function(client, articleId, callback){
 			gameObject.links = links;
 			//Set Article History
 			gameObject.history.push(article);
-			//inform all players about article (debug)
-			server.broadcastMsg("Gegner auf: "+article);
+			//inform all players in game about article (debug)
+			server.broadcastMsgGame(client, gameObject.id , "Gegner auf: "+article);
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
-				callback(false, bodycontent, gameObject.history);
+				callback(false, bodycontent, gameObject.history, gameObject.id);
 			});
 		});
 	});
