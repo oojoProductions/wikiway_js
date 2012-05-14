@@ -1,6 +1,7 @@
 !!! 5
 html
 	head
+		meta(charset="utf-8")
 		title wikiway_js
 		//jQuery
 		script(type="text/javascript", src="https://www.google.com/jsapi")
@@ -12,9 +13,16 @@ html
 		link(rel="stylesheet", href="./css/style2.css", type="text/css", media="all")
 		//Client
 		script(type="text/javascript", src="/js/client.js")
+		//blockUI
+		script(type="text/javascript", src="http://api.schnegg.biz/jqueryplugins/blockUI/blockUI.js")
+		//autocomplete
+		script(type="text/javascript", src="http://api.schnegg.biz/jqueryplugins/autocomplete/autocomplete.js")
+		link(rel="stylesheet", href="http://api.schnegg.biz/jqueryplugins/autocomplete/autocomplete.css", type="text/css", media="all")
 		//jGrowl
 		script(type="text/javascript", src="http://api.schnegg.biz/jqueryplugins/jgrowl/jgrowl.js")
 		script(type="text/javascript", src="./js/jGrowlTheme.js")
 		link(rel="stylesheet", href="http://api.schnegg.biz/jqueryplugins/jgrowl/jgrowl.css", type="text/css", media="all")
 	body
-		div#wikiwayContent
+		div#wikiwayWrapper
+			div#wikiwayContent
+			div#wikiwayFooter

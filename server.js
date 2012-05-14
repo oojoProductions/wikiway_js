@@ -65,6 +65,12 @@ io.sockets.on('connection', function(client) {
 			}
 			//show welcome message
 			client.emit('growl', "Willkommen! "+clientCount+ " Spieler verbunden.", 0);
+			
+			// ask user for name
+			templ.render('getUsername', null, function (data){
+				client.emit('getUsername', data);
+			});
+			
 		});
     });
 	//List all Games
@@ -117,6 +123,16 @@ io.sockets.on('connection', function(client) {
 			{
 				client.emit('updateContent', bodycontent);			
 			}
+		});
+	});
+	//User can Set his name
+	client.on('setUsername', function(name){
+		client.set('username', name, function(){
+			client.emit('hideSetUsername');
+			client.emit('growl', 'Dein Username: '+name, 0);
+			client.get('username', function(err, username){
+				console.log("Set username: "+username);
+			});
 		});
 	});
 	
