@@ -114,6 +114,8 @@ exports.next = function(client, articleId, callback){
 		}
 		//Get requested article from Wikipedia
 		getWikiContent(article, function(bodycontent, links){
+			//if article could not load do nothing
+			if(bodycontent==null) return;
 			//Set Links to use Later
 			gameObject.links = links;
 			//Set Article History
@@ -138,8 +140,16 @@ function getArticleFromLinkArray(links, id){
 	return article;
 }
 //Private function get Wikipedia article
-function getWikiContent(article, callback){
-	request("http://de.wikipedia.org/wiki/"+article, function (error, response, body) {
+function getWikiContent(article, callback, trys){
+	//Set trys back if not set
+	if (trys == null) trys = 1;
+	//options for request, User-Agent in header is important to not get blocked from wikipedia because of to many requests
+	var options = {
+		uri: 'http://de.wikipedia.org/wiki/'+article,
+		headers: {'User-Agent': 'wikiway_js'}
+	};
+	//Get Wikipedia article
+	request(options, function (error, response, body) {
 		//Is Page valid?
 		if (!error && response.statusCode == 200) {
 			var regex = '<!-- bodyContent -->((.|\n|\r)*)<!-- /bodycontent -->';
@@ -182,8 +192,15 @@ function getWikiContent(article, callback){
 			//Call callback with the content of wikipedia and the links array
 			callback(bodycontent, links);
 		}else{
-			console.log('game - failed to load wikipedia article: '+article);
-			callback(null, null);
+			console.log('game - failed to load wikipedia article: '+article+', Fehler: '+error+' Statuscode: '+response.statusCode+' Versuch: '+trys);
+			//Retry 5 times then call callback with no output
+			if (trys < 5){
+				getWikiContent(article, callback, trys + 1);
+			}
+			else
+			{
+				callback(null, null);
+			}
 		}
 	});
 };
