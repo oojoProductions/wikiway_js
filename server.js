@@ -82,18 +82,20 @@ io.sockets.on('connection', function(client) {
 	
 	//Client creates new game or show form if start and endarticle == null
 	client.on('newGame', function(startArticle, endArticle) {
-		if (game.newGame(startArticle, endArticle))
-		{
-			templ.render('listGames', {games: game.listGames()}, function (data){
-				client.emit('updateContent', data);
-			});
-		}
-		else
-		{
-			templ.render('newGame', null, function (data){
-				client.emit('updateContent', data);
-			});
-		}
+		game.newGame(startArticle, endArticle, function(success){
+			if (success)
+			{
+				templ.render('listGames', {games: game.listGames()}, function (data){
+					client.emit('updateContent', data);
+				});
+			}
+			else
+			{
+				templ.render('newGame', null, function (data){
+					client.emit('updateContent', data);
+				});
+			}		
+		});
 	});
 	
 	//Client joins game

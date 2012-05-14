@@ -24,12 +24,50 @@ games[1]["startArticle"] = "Aldi";
 games[1]["endArticle"] = "Lidl";
 
 //Make New Game
-exports.newGame = function(startArticle, endArticle){
-	//If Articles not defined return false
-	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "" || startArticle == endArticle) return false;
-	//Save Game in Array and return true
-	games.push(new Object({startArticle: startArticle, endArticle: endArticle}));
-	return true;
+exports.newGame = function(startArticle, endArticle, callback){
+	//General checks
+	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "" || startArticle == endArticle)
+	{
+		callback(false);
+		return;
+	}
+	else
+	{
+		//request options; only load head
+		var options = {
+			uri: 'http://de.wikipedia.org/wiki/'+startArticle,
+			method: "HEAD",
+			headers: {'User-Agent': 'wikiway_js'}
+		};
+		//check if startArticle exists
+		request(options, function(error, response, body){
+			if (response.statusCode != 200)
+			{
+				callback(false);
+				return;
+			}
+			else
+			{
+				options.uri = 'http://de.wikipedia.org/wiki/'+endArticle;
+				//check if endArticle exists
+				request(options, function(error, response, body){
+					if (response.statusCode != 200)
+					{
+						callback(false);
+						return;
+					}
+					else
+					{
+						//if everything is ok create game and fire callback
+						console.log('game - new game created');
+						games.push(new Object({startArticle: startArticle, endArticle: endArticle}));
+						callback(true);
+					}
+				});
+			}
+		});
+	}
+
 };
 
 //Join Game
