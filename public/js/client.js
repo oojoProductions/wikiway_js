@@ -16,7 +16,7 @@
 			if($('#text-username').val() != ""){
 				socket.emit('setUsername', $('#text-username').val());
 			}else{
-				growl('Bitte Username eingeben!!!', 1);
+				growl('Bitte Username eingeben!', 1);
 			}
 		});
 		
@@ -59,7 +59,7 @@
 			if($('#text-startArticle').val() != "" & $('#text-endArticle').val() != ""){
 				socket.emit('newGame', $('#text-startArticle').val(), $('#text-endArticle').val());
 			}else{
-				growl('Bitte Start- und Endartikel eingeben!!!', 1);
+				growl('Bitte Start- und Endartikel eingeben!', 1);
 			}
 		});
 		
@@ -84,6 +84,15 @@
 	socket.on('growl', function(msg, type) {
 		growl(msg, type);
 	});
+	
+	//Get control over the f5 key on the keyboard to refresh the page
+	$(document).keydown(function(event) {
+		if(event.keyCode == 116){
+			event.preventDefault();
+			growl('Seite erneuert!', 1);
+			socket.emit('refresh');
+		}
+	});	
 	
 	//Init when loaded the first time
 	socket.emit('init');

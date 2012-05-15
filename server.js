@@ -47,33 +47,18 @@ io.sockets.on('connection', function(client) {
 	//Client loads Webpage
 	client.on('init', function() {
 		console.log('client - init from browser');
-        //Check if user is in game
-		game.inGame(client, function (inGame){
-			if (inGame)
-			{	
-				//If user is in game serve last article
-				game.next(client, null, function(wiki){
-					client.emit('updateContent', wiki);
-				});
-			}
-			else
-			{	
-				//If user is not in game serve list of games
-				templ.render('listGames', {games: game.listGames()}, function (data){
-					client.join('listGames');
-					client.emit('updateContent', data);
-				});
-			}
-			//show welcome message
-			client.emit('growl', "Willkommen! "+clientCount+ " Spieler verbunden.", 0);
-			
-			// ask user for name
-			templ.render('getUsername', null, function (data){
-				client.emit('getUsername', data);
-			});
-			
+		// refresh
+		refresh(client);
+		
+		//show welcome message
+		client.emit('growl', "Willkommen! "+clientCount+ " Spieler verbunden.", 0);
+		
+		// ask user for name
+		templ.render('getUsername', null, function (data){
+			client.emit('getUsername', data);
 		});
     });
+	
 	//List all Games
 	client.on('listGames', function() {
 		templ.render('listGames', {games: game.listGames()}, function (data){
@@ -147,6 +132,11 @@ io.sockets.on('connection', function(client) {
 		});
 	});
 	
+	//User can refresh the page
+	client.on('refresh', function() {
+		refresh(client);
+	});
+	
     client.on('disconnect', function() {
 		//-1 client
 		--clientCount;
@@ -176,6 +166,29 @@ exports.broadcastContentGame = function (client, gameId, template, locals) {
 	});
 };
 //--------------------------------
+
+//private functions
+//----------------------------------
+function refresh(client){
+	//Check if user is in game
+	game.inGame(client, function (inGame){
+		if (inGame)
+		{
+			//If user is in game serve last article
+			game.next(client, null, function(win, bodycontent, history, gameId){
+				client.emit('updateContent', bodycontent);
+			});
+		}
+		else
+		{	
+			//If user is not in game serve list of games
+			templ.render('listGames', {games: game.listGames()}, function (data){
+				client.join('listGames');
+				client.emit('updateContent', data);
+			});
+		}
+	});
+};
 
 //Start the whole thing
 server.listen(port);
