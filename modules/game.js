@@ -25,9 +25,6 @@ games[1]["endArticle"] = "Lidl";
 
 //Make New Game
 exports.newGame = function(startArticle, endArticle, callback){
-	//Replace " " with "_"
-	startArticle.replace(' ','_');
-	endArticle.replace(' ','_');
 	//General checks
 	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "" || startArticle == endArticle)
 	{
@@ -36,6 +33,9 @@ exports.newGame = function(startArticle, endArticle, callback){
 	}
 	else
 	{
+		//Replace " " with "_"
+		startArticle.replace(' ','_');
+		endArticle.replace(' ','_');
 		//request options; only load head
 		var options = {
 			uri: 'http://de.wikipedia.org/wiki/'+startArticle,
@@ -87,6 +87,7 @@ exports.joinGame = function(client, gameId, callback){
 		gameObject['history'] = Array();
 		gameObject['links'] = Array();
 		//Client joins socket.io room for game
+		client.leave('listGames');
 		client.join(gameId);
 		//Set game object
 		client.set('game', gameObject, callback);
