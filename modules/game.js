@@ -25,6 +25,9 @@ games[1]["endArticle"] = "Lidl";
 
 //Make New Game
 exports.newGame = function(startArticle, endArticle, callback){
+	//Replace " " with "_"
+	startArticle.replace(' ','_');
+	endArticle.replace(' ','_');
 	//General checks
 	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "" || startArticle == endArticle)
 	{
