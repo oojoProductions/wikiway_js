@@ -110,7 +110,11 @@ io.sockets.on('connection', function(client) {
 					client.emit('updateContent', data);
 					templ.render('lose', {history: history}, function (data){
 						client.broadcast.in(gameId).emit('updateContent', data);
-						client.broadcast.in(gameId).leave(gameId);
+						var clientsInGame = io.sockets.clients(gameId);
+						for (i in clientsInGame)
+						{
+							clientsInGame[i].leave(gameId);
+						}
 					});
 				});
 
