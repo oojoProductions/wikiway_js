@@ -123,10 +123,12 @@ io.sockets.on('connection', function(client) {
 			{
 				templ.render('win', {history: history}, function (data){
 					client.emit('updateContent', data);
+					templ.render('lose', {history: history}, function (data){
+						client.broadcast.in(gameId).emit('updateContent', data);
+						client.broadcast.in(gameId).leave(gameId);
+					});
 				});
-				templ.render('lose', {history: history}, function (data){
-					client.broadcast.in(gameId).emit('updateContent', data);
-				});
+
 			}
 			else
 			{
