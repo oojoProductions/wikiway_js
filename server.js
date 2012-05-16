@@ -85,7 +85,7 @@ io.sockets.on('connection', function(client) {
 					client.join('listGames');
 					client.emit('updateContent', data);
 					//Update others on list game page
-					client.broadcast.to('listGames').emit('growl', data);
+					client.broadcast.to('listGames').emit('updateContent', data);
 				});
 			}
 			else
@@ -128,7 +128,7 @@ io.sockets.on('connection', function(client) {
 			}
 			else
 			{
-				client.emit('updateContent', bodycontent);			
+				client.emit('updateContent', bodycontent);
 			}
 		});
 	});
