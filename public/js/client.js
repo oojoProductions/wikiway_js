@@ -121,12 +121,6 @@
                 header: '<img class="jGrowlImage" src="./img/' + image + '" />'+header
         });	
 	}
-	
-	$("#wikiwayWrapper").splitter({
-		type: "h", 
-		sizeTop: true,	/* use height set in stylesheet */
-		accessKey: "P"
-	});
 });
 
 
