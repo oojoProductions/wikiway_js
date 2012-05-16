@@ -112,13 +112,16 @@ io.sockets.on('connection', function(client) {
 			{
 				templ.render('win', {history: history}, function (data){
 					client.emit('updateContent', data);
-					templ.render('lose', {history: history}, function (data){
-						client.broadcast.in(gameId).emit('updateContent', data);
-						var clientsInGame = io.sockets.clients(gameId);
-						for (i in clientsInGame)
-						{
-							game.leaveGame(clientsInGame[i], gameId);
-						}
+					//Get client username
+					client.get('username', function(err, username){
+						templ.render('lose', {history: history, winner: username}, function (data){
+							client.broadcast.in(gameId).emit('updateContent', data);
+							var clientsInGame = io.sockets.clients(gameId);
+							for (i in clientsInGame)
+							{
+								game.leaveGame(clientsInGame[i], gameId);
+							}
+						});
 					});
 				});
 
@@ -188,7 +191,7 @@ function refresh(client){
 			});
 		}
 		else
-		{	
+		{
 			//If user is not in game serve list of games
 			templ.render('listGames', {games: game.listGames(client)}, function (data){
 				client.emit('updateContent', data);
