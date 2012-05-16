@@ -98,7 +98,7 @@ io.sockets.on('connection', function(client) {
 	client.on('joinGame', function(gameId) {
 		game.joinGame(client, gameId, function(){
 			//Goto first article
-			game.next(client, null, function(win, bodycontent, history){
+			game.next(client, null, function(win, bodycontent, gameId, args){
 				client.emit('updateContent', bodycontent);
 			});
 		});

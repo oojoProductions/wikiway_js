@@ -175,8 +175,8 @@ exports.next = function(client, articleId, callback){
 				//Define username as optional variable
 				args["username"] = username;
 				callback(true, null, gameObject.id, args);
-				return;
 			});
+			return;
 		}
 		//Get requested article from Wikipedia
 		getWikiContent(article, function(bodycontent, links){
