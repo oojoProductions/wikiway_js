@@ -4,15 +4,18 @@
 	// Server methodes
 	//----------------------------------------
 	
+	//The server function to switch the html code of content div
 	socket.on('updateContent', function(data) {
 		document.getElementById('wikiwayContent').innerHTML = data;
 		initUserInputs();
 	});
 	
+	//The server function to get the username frome user (block the ui, show a username form)
 	socket.on('getUsername', function(form) {
 		$.blockUI({ message: form });
 		//Get Control over Submitbutton
 		$("#getUsernameButton").click(function(){
+			//Clientside validation, just growl a message if its not ok
 			if($('#text-username').val() != ""){
 				socket.emit('setUsername', $('#text-username').val());
 			}else{
@@ -27,9 +30,12 @@
 			}
 		});		
 	});
+	
+	//The server function to unblock the username set form
 	socket.on('hideSetUsername', function() {
 		$.unblockUI(); 
 	});
+	
 	function initUserInputs(){
 		// Userinput methodes
 		//----------------------------------------
@@ -56,6 +62,7 @@
 		
 		//Get Control over Submitbutton
 		$("#newGameButton").click(function(){
+			//Clientside validation, just growl a message if its not ok
 			if($('#text-startArticle').val() != "" & $('#text-endArticle').val() != ""){
 				socket.emit('newGame', $('#text-startArticle').val(), $('#text-endArticle').val());
 			}else{
@@ -70,17 +77,18 @@
 			}
 		});
 		
-		//Autocomplete new article form
+		//Autocomplete new article form, start article
 		$('#text-startArticle').autocomplete({
 			serviceUrl:'http://api.schnegg.biz/wikiapi/search.php'
 		});
 		
-		//Autocomplete new article form
+		//Autocomplete new article form, end article
 		$('#text-endArticle').autocomplete({
 			serviceUrl:'http://api.schnegg.biz/wikiapi/search.php'
 		});		
 	};
 	
+	//Client growlfunction
 	socket.on('growl', function(msg, type) {
 		growl(msg, type);
 	});
@@ -97,6 +105,7 @@
 	//Init when loaded the first time
 	socket.emit('init');
 	
+	//Private growl function
 	function growl(msg, type) {
 		var header = '';
 		var image = '';
