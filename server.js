@@ -79,10 +79,10 @@ io.sockets.on('connection', function(client) {
 			if (success)
 			{
 				templ.render('listGames', {games: game.listGames(client)}, function (data){
-					//Update client
-					client.emit('updateContent', data);
-					//Update others on list game page
-					client.broadcast.to('listGames').emit('updateContent', data);
+					//Update all clients in listGames
+					io.sockets.in('listGames').emit('updateContent', data);
+					//Output message new game created
+					io.sockets.in('listGames').emit('growl', 'Neues Spiel erstellt!',0);
 				});
 			}
 			else
