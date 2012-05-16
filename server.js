@@ -15,8 +15,15 @@ var game = require('./modules/game.js');
 //Include template functions
 var templ = require('./modules/templ.js');
 
-//Port for Game
+//Port for Development
 var port = 1337;
+//First to args are path to node and to script
+var arguments = process.argv.splice(2);
+//Get port from commandline if set
+if (arguments.length && !(isNaN(arguments[0])))
+{
+	port = arguments[0];
+}
 
 //Define Server
 var server = express.createServer();
@@ -196,3 +203,4 @@ function refresh(client){
 
 //Start the whole thing
 server.listen(port);
+console.log('server - started on port '+port);
