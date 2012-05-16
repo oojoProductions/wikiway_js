@@ -107,21 +107,23 @@ io.sockets.on('connection', function(client) {
 	//Next article
 	client.on('next', function(articleId) {
 		console.log('client - next article');
-		game.next(client, articleId, function(win, bodycontent, history, gameId){
+		game.next(client, articleId, function(win, bodycontent, gameId, args){
 			if (win)
 			{
+				//Get history from optional args array
+				history = args['history'];
+				//Get username from optional args array
+				username = args['username'];
 				templ.render('win', {history: history}, function (data){
 					client.emit('updateContent', data);
-					//Get client username
-					client.get('username', function(err, username){
-						templ.render('lose', {history: history, winner: username}, function (data){
-							client.broadcast.in(gameId).emit('updateContent', data);
-							var clientsInGame = io.sockets.clients(gameId);
-							for (i in clientsInGame)
-							{
-								game.leaveGame(clientsInGame[i], gameId);
-							}
-						});
+					//Render lose template
+					templ.render('lose', {history: history, winner: username}, function (data){
+						client.broadcast.in(gameId).emit('updateContent', data);
+						var clientsInGame = io.sockets.clients(gameId);
+						for (i in clientsInGame)
+						{
+							game.leaveGame(clientsInGame[i], gameId);
+						}
 					});
 				});
 

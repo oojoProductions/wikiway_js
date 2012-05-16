@@ -135,6 +135,9 @@ exports.inGame = function(client, callback){
 
 //Next Step for User
 exports.next = function(client, articleId, callback){
+	//Array with optional variables for callback
+	var args = new Array();
+	
 	//Get User specific stuff
 	client.get('game', function(err, gameObject){
 		
@@ -165,8 +168,15 @@ exports.next = function(client, articleId, callback){
 			//Debug
 			console.log('game - end article found: '+article);
 			gameObject.history.push(article);
-			callback(true, null, gameObject.history, gameObject.id);
-			return;
+			//Define history as optional variable
+			args["history"] = gameObject.history;
+			//Get client username
+			client.get('username', function(err, username){
+				//Define username as optional variable
+				args["username"] = username;
+				callback(true, null, gameObject.id, args);
+				return;
+			});
 		}
 		//Get requested article from Wikipedia
 		getWikiContent(article, function(bodycontent, links){
@@ -182,7 +192,7 @@ exports.next = function(client, articleId, callback){
 			});
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
-				callback(false, bodycontent, gameObject.history, gameObject.id);
+				callback(false, bodycontent, gameObject.id, args);
 			});
 		});
 	});
