@@ -68,21 +68,18 @@ io.sockets.on('connection', function(client) {
 	
 	//List all Games
 	client.on('listGames', function() {
-		templ.render('listGames', {games: game.listGames()}, function (data){
-			client.join('listGames');
+		templ.render('listGames', {games: game.listGames(client)}, function (data){
 			client.emit('updateContent', data);
 		});
 	});
 	
 	//Client creates new game or show form if start and endarticle == null
 	client.on('newGame', function(startArticle, endArticle) {
-		client.leave('listGames');
-		game.newGame(startArticle, endArticle, function(success){
+		game.newGame(startArticle, endArticle, client, function(success){
 			if (success)
 			{
-				templ.render('listGames', {games: game.listGames()}, function (data){
+				templ.render('listGames', {games: game.listGames(client)}, function (data){
 					//Update client
-					client.join('listGames');
 					client.emit('updateContent', data);
 					//Update others on list game page
 					client.broadcast.to('listGames').emit('updateContent', data);
@@ -120,7 +117,7 @@ io.sockets.on('connection', function(client) {
 						var clientsInGame = io.sockets.clients(gameId);
 						for (i in clientsInGame)
 						{
-							clientsInGame[i].leave(gameId);
+							game.leaveGame(clientsInGame[i], gameId);
 						}
 					});
 				});
@@ -193,8 +190,7 @@ function refresh(client){
 		else
 		{	
 			//If user is not in game serve list of games
-			templ.render('listGames', {games: game.listGames()}, function (data){
-				client.join('listGames');
+			templ.render('listGames', {games: game.listGames(client)}, function (data){
 				client.emit('updateContent', data);
 			});
 		}

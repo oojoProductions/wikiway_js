@@ -24,7 +24,9 @@ games[1]["startArticle"] = "Aldi";
 games[1]["endArticle"] = "Lidl";
 
 //Make New Game
-exports.newGame = function(startArticle, endArticle, callback){
+exports.newGame = function(startArticle, endArticle, client, callback){
+	//Leave listGames channel
+	client.leave('listGames');
 	//General checks
 	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "" || startArticle == endArticle)
 	{
@@ -64,13 +66,13 @@ exports.newGame = function(startArticle, endArticle, callback){
 						//if everything is ok create game and fire callback
 						console.log('game - new game created');
 						games.push(new Object({startArticle: startArticle, endArticle: endArticle}));
+						//Call callback
 						callback(true);
 					}
 				});
 			}
 		});
 	}
-
 };
 
 //Join Game
@@ -86,7 +88,7 @@ exports.joinGame = function(client, gameId, callback){
 		gameObject['id'] = gameId;
 		gameObject['history'] = Array();
 		gameObject['links'] = Array();
-		//Client joins socket.io room for game
+		//Client joins socket.io room for game and leaves room listGames
 		client.leave('listGames');
 		client.join(gameId);
 		//Set game object
@@ -94,16 +96,28 @@ exports.joinGame = function(client, gameId, callback){
 	}
 };
 
-//List all Games
-exports.listGames = function(){
+//Leave Game
+exports.leaveGame = function(client, gameId){
+	//Set Game null
+	client.set('game', null);
+	//Leave Gamechannel
+	client.leave(gameId);
+};
+
+//List all Games and join listGames channel if client is set
+exports.listGames = function(client){
+	if (typeof client != 'undefined')
+	{
+		client.join('listGames');
+	}
 	return games;
 };
+
 //Show single Game
 exports.getGame = function(gameId){
 	if (gameId in games) return games[gameId];
 	return null;
 };
-
 
 //Checks if user is in Game
 exports.inGame = function(client, callback){
