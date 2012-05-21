@@ -140,7 +140,7 @@ io.sockets.on('connection', function(client) {
 			client.emit('hideSetUsername');
 			client.emit('growl', 'Dein Username: '+name, 0);
 			client.get('username', function(err, username){
-				console.log("Set username: "+username);
+				console.log("server - set username: "+username);
 			});
 		});
 	});
