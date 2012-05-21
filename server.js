@@ -188,7 +188,7 @@ function refresh(client){
 		if (inGame)
 		{
 			//If user is in game serve last article
-			game.next(client, null, function(win, bodycontent, history, gameId){
+			game.next(client, null, function(win, bodycontent, gameId, args){
 				client.emit('updateContent', bodycontent);
 			});
 		}

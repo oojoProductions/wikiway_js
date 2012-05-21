@@ -179,9 +179,11 @@ exports.next = function(client, articleId, callback){
 			return;
 		}
 		//Get requested article from Wikipedia
-		getWikiContent(article, function(bodycontent, links){
+		getWikiContent(article, function(bodycontent, links, title){
 			//if article could not load do nothing
 			if(bodycontent==null) return;
+			//ad title to bodycontent (very ugly -> jade template)
+			bodycontent = '<h1 class="firstHeading">'+title+'</h1>'+bodycontent;
 			//Set Links to use Later
 			gameObject.links = links;
 			//Set Article History
@@ -218,20 +220,29 @@ function getWikiContent(article, callback, trys){
 	request(options, function (error, response, body) {
 		//Is Page valid?
 		if (!error && response.statusCode == 200) {
-			var regex = '<!-- bodyContent -->((.|\n|\r)*)<!-- /bodycontent -->';
-			var bodycontent = body.match(regex);
+			var regexContent = '<!-- bodyContent -->((.|\n|\r)*)<!-- /bodycontent -->';
+			var bodycontent = body.match(regexContent);
 			bodycontent = bodycontent[1];
-			var linkRegex = new RegExp('<a href="/wiki/(.*?)".*?>(.*?)</a>',"g");
+			
+			var regexTitleBlock = '<!-- firstHeading -->((.|\n|\r)*)<!-- /firstHeading -->';
+			var titleBlock = body.match(regexTitleBlock);
+			titleBlock = titleBlock[1];
+			
+			var regexTitle = new RegExp('<span dir="auto">(.*?)</span>');
+			var title = titleBlock.match(regexTitle);
+			title = title[1];
+			
+			var regexLink = new RegExp('<a href="/wiki/(.*?)".*?>(.*?)</a>',"g");
 			
 			//Build Link Array
-			var links = bodycontent.match(linkRegex, "g");
+			var links = bodycontent.match(regexLink, "g");
 			for(var i=0; i<links.length; i++) {
 				var value = links[i];
 				var url = value.match("href=\"(.*?)\"");
 				bodycontent = bodycontent.replace(url[1], "#\" action=\"next\" art=\""+i);
 			}
 
-			// remove edit links
+			//Remove edit links
 			var editsRegex = new RegExp('<span class="editsection">.*?</span>',"g");
 			var edits = bodycontent.match(editsRegex, "g");
 			if (!(edits == null))
@@ -241,7 +252,7 @@ function getWikiContent(article, callback, trys){
 					bodycontent = bodycontent.replace(edit, "");
 				}
 			}
-			// remove all external links
+			//Remove all external links
 			var extlinkRegex = new RegExp('<a.*?href=".*?</a>',"g");
 			var extlinks = bodycontent.match(extlinkRegex, "g");
 			if (!(extlinks == null))
@@ -256,7 +267,7 @@ function getWikiContent(article, callback, trys){
 			}
 			
 			//Call callback with the content of wikipedia and the links array
-			callback(bodycontent, links);
+			callback(bodycontent, links, title);
 		}else{
 			console.log('game - failed to load wikipedia article: '+article+', Fehler: '+error+' Statuscode: '+response.statusCode+' Versuch: '+trys);
 			//Retry 5 times then call callback with no output
@@ -265,7 +276,7 @@ function getWikiContent(article, callback, trys){
 			}
 			else
 			{
-				callback(null, null);
+				callback(null, null, null);
 			}
 		}
 	});
