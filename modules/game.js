@@ -36,8 +36,8 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 	else
 	{
 		//Replace " " with "_"
-		startArticle.replace(' ','_');
-		endArticle.replace(' ','_');
+		startArticle = startArticle.replace(/ /g,'_');
+		endArticle = endArticle.replace(/ /g,'_');
 		//request options; only load head
 		var options = {
 			uri: 'http://de.wikipedia.org/wiki/'+startArticle,
@@ -49,6 +49,7 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 			if (response.statusCode != 200)
 			{
 				callback(false);
+				console.log('game - startarticle ('+startArticle+') not found');
 				return;
 			}
 			else
@@ -59,12 +60,13 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 					if (response.statusCode != 200)
 					{
 						callback(false);
+						console.log('game - endarticle ('+endarticle+') not found');
 						return;
 					}
 					else
 					{
 						//if everything is ok create game and fire callback
-						console.log('game - new game created');
+						console.log('game - new game created: '+startArticle+' to ' +endArticle);
 						games.push(new Object({startArticle: startArticle, endArticle: endArticle}));
 						//Call callback
 						callback(true);
