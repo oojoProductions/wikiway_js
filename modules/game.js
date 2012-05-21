@@ -18,10 +18,12 @@ var games = new Array();
 games[0] = new Object();
 games[0]["startArticle"] = "Coop";
 games[0]["endArticle"] = "Migros";
+games[0]["clientCount"] = 0;
 
 games[1] = new Object();
 games[1]["startArticle"] = "Aldi";
 games[1]["endArticle"] = "Lidl";
+games[1]["clientCount"] = 0;
 
 //Make New Game
 exports.newGame = function(startArticle, endArticle, client, callback){
@@ -67,7 +69,15 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 					{
 						//if everything is ok create game and fire callback
 						console.log('game - new game created: '+startArticle+' to ' +endArticle);
-						games.push(new Object({startArticle: startArticle, endArticle: endArticle}));
+						game = new Object
+						(
+							{
+								startArticle: startArticle,
+								endArticle: endArticle,
+								clientsCount: 0,
+							}
+						);
+						games.push(game);
 						//Call callback
 						callback(true);
 					}
@@ -85,6 +95,8 @@ exports.joinGame = function(client, gameId, callback){
 	}
 	else
 	{	
+		//++clientCount
+		++games[gameId]['clientCount'];
 		//Create Game Object for User
 		gameObject = new Object();
 		gameObject['id'] = gameId;
@@ -100,10 +112,18 @@ exports.joinGame = function(client, gameId, callback){
 
 //Leave Game
 exports.leaveGame = function(client, gameId){
-	//Set Game null
-	client.set('game', null);
-	//Leave Gamechannel
-	client.leave(gameId);
+	client.get('game', function(err, gameObject){
+		if (!(gameObject == null))
+		{
+			//--clientCount
+			--games[gameObject.id]['clientCount'];
+			//Leave Gamechannel
+			client.leave(gameObject.id);
+			//Set Game null
+			client.set('game', null);
+		}
+	});
+
 };
 
 //List all Games and join listGames channel if client is set

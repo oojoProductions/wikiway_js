@@ -101,6 +101,10 @@ io.sockets.on('connection', function(client) {
 			game.next(client, null, function(win, bodycontent, gameId, args){
 				client.emit('updateContent', bodycontent);
 			});
+			templ.render('listGames', {games: game.listGames(client)}, function (data){
+				//Update all clients in listGames
+				io.sockets.in('listGames').emit('updateContent', data);
+			});
 		});
 	});
 	
@@ -122,7 +126,7 @@ io.sockets.on('connection', function(client) {
 						var clientsInGame = io.sockets.clients(gameId);
 						for (i in clientsInGame)
 						{
-							game.leaveGame(clientsInGame[i], gameId);
+							game.leaveGame(clientsInGame[i]);
 						}
 					});
 				});
@@ -153,6 +157,8 @@ io.sockets.on('connection', function(client) {
     client.on('disconnect', function() {
 		//-1 client
 		--clientCount;
+		//Client should leave Game
+		game.leaveGame(client);
 		//log
         console.log('client - disconnected');
     });
