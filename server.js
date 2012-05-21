@@ -164,26 +164,63 @@ io.sockets.on('connection', function(client) {
         console.log('client - disconnected');
     });
 });
-
-//Server Broadcast a message for all users
-exports.broadcastMsgAll = function (client, msg) {
-	client.emit('growl', msg, 2);
-};
-//Server Broadcast a message for users in game
-exports.broadcastMsgGame = function (client, gameId, msg) {
-	client.broadcast.in(gameId).emit('growl', msg, 2);
-};
-//Server Broadcast content for all users
-exports.broadcastContentAll = function (client, template, locals) {
-	templ.render(template, null, function (data){
-		client.broadcast.emit('updateContent', data);
-	});
-};
-//Server Broadcast content for users in game
-exports.broadcastContentGame = function (client, gameId, template, locals) {
-	templ.render(template, null, function (data){
-		client.broadcast.in(gameId).emit('updateContent', data);
-	});
+//Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals
+exports.broadcast = function(args) {
+	//Message
+	if (typeof args.msg != 'undefined')
+	{
+		if (typeof args.msgType == 'undefined') args.msgType = 2;
+		if (typeof args.client == 'undefined')
+		{
+			if (typeof args.channel == 'undefined')
+			{
+				io.sockets.emit('growl', args.msg, args.MsgType);
+			}
+			else
+			{
+				io.sockets.in(args.channel).emit('growl', args.msg, args.MsgType);
+			}
+		}
+		else
+		{
+			if (typeof args.channel == 'undefined')
+			{
+				args.client.broadcast.emit('growl', args.msg, args.MsgType);
+			}
+			else
+			{
+				args.client.broadcast.in(args.channel).emit('growl', args.msg, args.MsgType);
+			}
+		}
+	}
+	//Template
+	if (typeof args.template != 'undefined' && typeof args.locals != 'undefined')
+	{
+		templ.render(args.template, args.locals, function (data){
+			if (typeof args.client == 'undefined')
+			{
+				if (typeof args.channel == 'undefined')
+				{
+					io.sockets.emit('updateContent', data);
+				}
+				else
+				{
+					io.sockets.in(args.channel).emit('updateContent', data);
+				}
+			}
+			else
+			{
+				if (typeof args.channel == 'undefined')
+				{
+					args.client.broadcast.emit('updateContent', data);
+				}
+				else
+				{
+					args.client.broadcast.in(args.channel).emit('updateContent', data);
+				}
+			}
+		});
+	}	
 };
 //--------------------------------
 

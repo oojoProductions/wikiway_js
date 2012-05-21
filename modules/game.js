@@ -216,8 +216,8 @@ exports.next = function(client, articleId, callback){
 			//Set Article History
 			gameObject.history.push(article);
 			//inform all players in game about article (debug)
-			client.get('username', function(err, username){
-				server.broadcastMsgGame(client, gameObject.id , username+" auf: "+article);
+			client.get('username', function(err, username) {
+				server.broadcast({client: client, channel: gameObject.id, msg: username+' auf: '+article});
 			});
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
