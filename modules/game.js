@@ -19,11 +19,13 @@ games[0] = new Object();
 games[0]["startArticle"] = "Coop";
 games[0]["endArticle"] = "Migros";
 games[0]["clientCount"] = 0;
+games[0].watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
 
 games[1] = new Object();
 games[1]["startArticle"] = "Aldi";
 games[1]["endArticle"] = "Lidl";
 games[1]["clientCount"] = 0;
+games[1].watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
 
 //Make New Game
 exports.newGame = function(startArticle, endArticle, client, callback){
@@ -74,9 +76,12 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 							{
 								startArticle: startArticle,
 								endArticle: endArticle,
-								clientsCount: 0,
+								clientCount: 0,
 							}
 						);
+						//Monitor changes in clientCount to notify other clients
+						game.watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
+						//Push to array
 						games.push(game);
 						//Call callback
 						callback(true);
@@ -306,3 +311,9 @@ function getWikiContent(article, callback, trys){
 		}
 	});
 };
+
+//Functions for watched variables
+function updateGameList (prop, oldVal, newVal) {
+	console.log('game - '+prop+' changed from '+oldVal+' to '+newVal);
+	return newVal;
+}

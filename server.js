@@ -9,7 +9,8 @@
 //wikiway uses express and socket.io
 var express = require('express'),
 	socketio = require('socket.io');
-
+//Extension for Object Prototype, now its possible to waatch changes in an object
+require('./modules/object_watch').init();
 //Include main game functions
 var game = require('./modules/game.js');
 //Include template functions
