@@ -9,7 +9,8 @@
 var request = require('request');
 
 //require server.js
-var server = require('./../server.js');
+var server = require('./../server.js'),
+	tools = require('./tools.js');
 
 //Array where all the Games are saved
 var games = new Array();
@@ -45,12 +46,9 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 	}
 	else
 	{
-		//Replace " " with "_"
-		startArticle = startArticle.replace(/ /g,'_');
-		endArticle = endArticle.replace(/ /g,'_');
 		//request options; only load head
 		var options = {
-			uri: 'http://de.wikipedia.org/wiki/'+startArticle,
+			uri: 'http://de.wikipedia.org/wiki/'+tools.uriEncode(startArticle),
 			method: "HEAD",
 			headers: {'User-Agent': 'wikiway_js'}
 		};
@@ -64,7 +62,7 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 			}
 			else
 			{
-				options.uri = 'http://de.wikipedia.org/wiki/'+endArticle;
+				options.uri = 'http://de.wikipedia.org/wiki/'+tools.uriEncode(endArticle);
 				//check if endArticle exists
 				request(options, function(error, response, body){
 					if (response.statusCode != 200)
@@ -211,21 +209,21 @@ exports.next = function(client, articleId, callback){
 			//Use startArticle if there is no history (user is new in game)
 			if (gameObject.history.lenght)
 			{
-				article = gameObject.history[gameObject.history.lenght-1];
+				article = tools.uriEncode(gameObject.history[gameObject.history.lenght-1]);
 			}
 			else
 			{
-				article = games[gameObject.id].startArticle;
+				article = tools.uriEncode(games[gameObject.id].startArticle);
 			}
 		}
 		//Logging
 		console.log('game - next article: '+article);
 		//Check if user wins the game
-		if (article === games[gameObject.id].endArticle)
+		if (article === tools.uriEncode(games[gameObject.id].endArticle))
 		{
 			//Debug
 			console.log('game - end article found: '+article);
-			gameObject.history.push(article);
+			gameObject.history.push(tools.uriDecode(article));
 			//Define history as optional variable
 			args["history"] = gameObject.history;
 			//Get client username
@@ -245,10 +243,10 @@ exports.next = function(client, articleId, callback){
 			//Set Links to use Later
 			gameObject.links = links;
 			//Set Article History
-			gameObject.history.push(article);
+			gameObject.history.push(tools.uriDecode(article));
 			//inform all players in game about article (debug)
 			client.get('username', function(err, username) {
-				server.broadcast({client: client, channel: gameObject.id, msg: username+' auf: '+article});
+				server.broadcast({client: client, channel: gameObject.id, msg: username+' auf: '+tools.uriDecode(article)});
 			});
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
