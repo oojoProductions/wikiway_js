@@ -139,7 +139,6 @@ io.sockets.on('connection', function(client) {
 	});
 	//Next article
 	client.on('next', function(articleId) {
-		console.log('client - next article');
 		game.next(client, articleId, function(started, win, gameId, args){
 			if (win)
 			{

@@ -218,6 +218,8 @@ exports.next = function(client, articleId, callback){
 				article = games[gameObject.id].startArticle;
 			}
 		}
+		//Logging
+		console.log('game - next article: '+article);
 		//Check if user wins the game
 		if (article === games[gameObject.id].endArticle)
 		{
