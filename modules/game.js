@@ -83,7 +83,7 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 								startArticle: startArticle,
 								endArticle: endArticle,
 								clientCount: 0,
-								clients: {},
+								clients: new Array(),
 								started: false,
 								won: false,
 							}
