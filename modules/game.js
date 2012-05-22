@@ -315,5 +315,6 @@ function getWikiContent(article, callback, trys){
 //Functions for watched variables
 function updateGameList (prop, oldVal, newVal) {
 	console.log('game - '+prop+' changed from '+oldVal+' to '+newVal);
+	server.broadcast({template: 'listGames', channel: 'listGames', locals: {games: games}});
 	return newVal;
 }

@@ -102,7 +102,7 @@ io.sockets.on('connection', function(client) {
 			game.next(client, null, function(win, bodycontent, gameId, args){
 				client.emit('updateContent', bodycontent);
 			});
-			templ.render('listGames', {games: game.listGames(client)}, function (data){
+			templ.render('listGames', {games: game.listGames()}, function (data){
 				//Update all clients in listGames
 				io.sockets.in('listGames').emit('updateContent', data);
 			});
