@@ -123,20 +123,21 @@ io.sockets.on('connection', function(client) {
 		if (gameId == null) return;
 		//start game
 		game.startGame(gameId);
-		//Goto first article
-		game.next(client, null, function(started, win, gameId, args){
-			if (started == false)
-			{
-				templ.render('waitingroom', {game: args.game, players: args.players}, function(data) {
-					client.emit('updateContent', data);
+		//Get all clients in gamechannel
+		var clientsInGame = io.sockets.clients(gameId);
+		//loop through all clients and update their content
+		for (i in clientsInGame)
+		{
+			//define anonym function and call it to keep client object even in a loop with asynchronus functions
+			//seriously - WTF???
+			(function(client) {
+				game.next(client, null, function(started, win, gameId, args) {
+					client.emit('updateContent', args.bodycontent);
 				});
-			}
-			else
-			{
-				client.emit('updateContent', args.bodycontent);
-			}
-		});
+			}(clientsInGame[i]));
+		}
 	});
+
 	//Next article
 	client.on('next', function(articleId) {
 		game.next(client, articleId, function(started, win, gameId, args){
