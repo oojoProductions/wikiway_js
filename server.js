@@ -99,8 +99,17 @@ io.sockets.on('connection', function(client) {
 	client.on('joinGame', function(gameId) {
 		game.joinGame(client, gameId, function(){
 			//Goto first article
-			game.next(client, null, function(win, bodycontent, gameId, args){
-				client.emit('updateContent', bodycontent);
+			game.next(client, null, function(started, win, gameId, args){
+				if (started == false)
+				{
+					templ.render('waitingroom', {game: args.game, players: args.players, gameId: gameId}, function(data) {
+						client.emit('updateContent', data);
+					});
+				}
+				else
+				{
+					client.emit('updateContent', args.bodycontent);
+				}
 			});
 			templ.render('listGames', {games: game.listGames()}, function (data){
 				//Update all clients in listGames
@@ -108,11 +117,30 @@ io.sockets.on('connection', function(client) {
 			});
 		});
 	});
-	
+
+	//Client can start game
+	client.on('startGame', function(gameId) {
+		if (gameId == null) return;
+		//start game
+		game.startGame(gameId);
+		//Goto first article
+		game.next(client, null, function(started, win, gameId, args){
+			if (started == false)
+			{
+				templ.render('waitingroom', {game: args.game, players: args.players}, function(data) {
+					client.emit('updateContent', data);
+				});
+			}
+			else
+			{
+				client.emit('updateContent', args.bodycontent);
+			}
+		});
+	});
 	//Next article
 	client.on('next', function(articleId) {
 		console.log('client - next article');
-		game.next(client, articleId, function(win, bodycontent, gameId, args){
+		game.next(client, articleId, function(started, win, gameId, args){
 			if (win)
 			{
 				//Get history from optional args array
@@ -135,7 +163,7 @@ io.sockets.on('connection', function(client) {
 			}
 			else
 			{
-				client.emit('updateContent', bodycontent);
+				client.emit('updateContent', args['bodycontent']);
 			}
 		});
 	});

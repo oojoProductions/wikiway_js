@@ -47,6 +47,10 @@
 					socket.emit('listGames');
 					break;
 				//Enter Game
+				case "startGame":
+					socket.emit('startGame', $(this).attr("game"));
+					break;
+				//Enter Game
 				case "joinGame":
 					socket.emit('joinGame', $(this).attr("game"));
 					break;

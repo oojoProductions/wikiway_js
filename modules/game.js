@@ -19,12 +19,18 @@ games[0] = new Object();
 games[0]["startArticle"] = "Coop";
 games[0]["endArticle"] = "Migros";
 games[0]["clientCount"] = 0;
+games[0]["clients"] = new Array();
+games[0]["started"] = false;
+games[0]["won"] = false;
 games[0].watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
 
 games[1] = new Object();
 games[1]["startArticle"] = "Aldi";
 games[1]["endArticle"] = "Lidl";
 games[1]["clientCount"] = 0;
+games[1]["clients"] = new Array();
+games[1]["started"] = false;
+games[1]["won"] = false;
 games[1].watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
 
 //Make New Game
@@ -77,6 +83,9 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 								startArticle: startArticle,
 								endArticle: endArticle,
 								clientCount: 0,
+								clients: {},
+								started: false,
+								won: false,
 							}
 						);
 						//Monitor changes in clientCount to notify other clients
@@ -100,6 +109,9 @@ exports.joinGame = function(client, gameId, callback){
 	}
 	else
 	{	
+		client.get('username', function(err,data) {
+			games[gameId]['clients'].push(data);
+		});
 		//++clientCount
 		++games[gameId]['clientCount'];
 		//Create Game Object for User
@@ -116,10 +128,14 @@ exports.joinGame = function(client, gameId, callback){
 };
 
 //Leave Game
-exports.leaveGame = function(client, gameId){
+exports.leaveGame = function(client){
 	client.get('game', function(err, gameObject){
 		if (!(gameObject == null))
 		{
+			//Delete username from list
+			client.get('username', function(err,data) {
+				games[gameObject.id]['clients'] = games[gameObject.id]['clients'].splice(games[gameObject.id]['clients'].indexOf(data),1);
+			});
 			//--clientCount
 			--games[gameObject.id]['clientCount'];
 			//Leave Gamechannel
@@ -129,6 +145,12 @@ exports.leaveGame = function(client, gameId){
 		}
 	});
 
+};
+
+//Start Game
+exports.startGame = function(gameId) {
+	console.log('game - start game with id: '+ gameId);
+	games[gameId]['started'] = true;
 };
 
 //List all Games and join listGames channel if client is set
@@ -164,12 +186,19 @@ exports.inGame = function(client, callback){
 exports.next = function(client, articleId, callback){
 	//Array with optional variables for callback
 	var args = new Array();
-	
 	//Get User specific stuff
 	client.get('game', function(err, gameObject){
-		
+		//Output all players in game
+		args['players'] = games[gameObject.id]['clients'];
 		//Check if user is in game, if not do nothing
 		if (gameObject == null) return;
+		//
+		if (!(games[gameObject.id].started))
+		{
+			args['game'] = games[gameObject.id];
+			callback(false, false, gameObject.id, args);
+			return;
+		}
 		//Get next Article
 		var article;
 		if (gameObject.links && articleId != null)
@@ -201,7 +230,7 @@ exports.next = function(client, articleId, callback){
 			client.get('username', function(err, username){
 				//Define username as optional variable
 				args["username"] = username;
-				callback(true, null, gameObject.id, args);
+				callback(true, true, gameObject.id, args);
 			});
 			return;
 		}
@@ -221,7 +250,8 @@ exports.next = function(client, articleId, callback){
 			});
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
-				callback(false, bodycontent, gameObject.id, args);
+				args['bodycontent'] = bodycontent;
+				callback(true, false, gameObject.id, args);
 			});
 		});
 	});
