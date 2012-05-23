@@ -6,7 +6,8 @@
 	
 	//The server function to switch the html code of content div
 	socket.on('updateContent', function(data) {
-		document.getElementById('wikiwayContent').innerHTML = data;
+		$('#wikiwayContent').html(data);
+		$('html, body').scrollTop('0');
 		initUserInputs();
 	});
 	
