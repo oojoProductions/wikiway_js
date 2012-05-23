@@ -1,2 +1,5 @@
 #userInfos
-	p Benutzername: {username}
+	p von #{startArticle} auf #{endArticle}
+	ol
+	- each client in clients
+		li #{client[0]} ist auf #{client[1]}

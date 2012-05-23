@@ -11,6 +11,10 @@
 		initUserInputs();
 	});
 	
+	socket.on('updateUserInfo', function(data) {
+		$('#wikiwayFooter').html(data);
+	});	
+	
 	//The server function to get the username frome user (block the ui, show a username form)
 	socket.on('getUsername', function(form) {
 		$.blockUI({ message: form });

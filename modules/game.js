@@ -117,6 +117,8 @@ exports.joinGame = function(client, gameId, callback){
 		gameObject['id'] = gameId;
 		gameObject['history'] = Array();
 		gameObject['links'] = Array();
+		gameObject['startArticle'] = games[gameId].startArticle;
+		gameObject['endArticle'] = games[gameId].endArticle;
 		//Client joins socket.io room for game and leaves room listGames
 		client.leave('listGames');
 		client.join(gameId);
@@ -207,9 +209,9 @@ exports.next = function(client, articleId, callback){
 		else
 		{
 			//Use startArticle if there is no history (user is new in game)
-			if (gameObject.history.lenght)
+			if (gameObject.history.length)
 			{
-				article = tools.uriEncode(gameObject.history[gameObject.history.lenght-1]);
+				article = tools.uriEncode(gameObject.history[gameObject.history.length-1]);
 			}
 			else
 			{

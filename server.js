@@ -261,8 +261,13 @@ function refresh(client){
 		{
 			//If user is in game serve last article
 			game.next(client, null, function(win, bodycontent, gameId, args){
-				client.emit('updateContent', bodycontent);
+				client.emit('updateContent', args.bodycontent);
 			});
+			
+			console.log('------- renderUserInfo------');
+			renderUserInfo(client, function(html){
+				client.emit('updateUserInfo', html);
+			});			
 		}
 		else
 		{
@@ -273,6 +278,34 @@ function refresh(client){
 		}
 	});
 };
+
+function renderUserInfo(client, callback){
+	var clients = new Array();
+	client.get('game', function(err, gameObject){
+		//Get all clients in gamechannel
+		var clientsInGame = io.sockets.clients(gameObject.id);
+		var startArticle = gameObject.startArticle;
+		var endArticle = gameObject.endArticle;
+	
+		//loop through all clients and update their content
+		for (i in clientsInGame)
+		{
+			//define anonym function and call it to keep client object even in a loop with asynchronus functions
+			(function(client) {
+				client.get('username', function(err, username){
+					client.get('game', function(err, gameObject){
+						var history = gameObject.history;
+						clients.push(new Array(username, history[history.length-1]));
+						//If user is not in game serve list of games
+						templ.render('userInfos', {clients: clients, startArticle: startArticle, endArticle: endArticle}, function (data){
+							callback(data);
+						});						
+					});
+				});
+			}(clientsInGame[i]));
+		}
+	});
+}
 
 //Start the whole thing
 server.listen(port);
