@@ -4,7 +4,7 @@ h1 Liste der aktiven Spiele -
 	- each game, i in games
 		a(href="#", action="joinGame", game="#{i}") Von #{game.startArticle} nach #{game.endArticle} - Spieler: #{game.clientCount}
 		- if (game.started)
-			\ \- Spiel bereits gestartet!
+			span - Spiel bereits gestartet!
 		br
 - else
 	p Keine aktiven Spiele! :(
