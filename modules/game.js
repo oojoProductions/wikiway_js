@@ -250,6 +250,12 @@ exports.next = function(client, articleId, callback){
 			client.get('username', function(err, username) {
 				server.broadcast({client: client, channel: gameObject.id, msg: username+' auf: '+tools.uriDecode(article)});
 			});
+			
+			//--- degbug ------
+			server.renderUserInfo(client, function(html){
+				client.broadcast.emit('updateUserInfo', html);
+			});
+			
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
 				args['bodycontent'] = bodycontent;

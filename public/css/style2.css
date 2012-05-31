@@ -33,12 +33,114 @@
 #wikiwayFooter{
 	position:fixed;
 	bottom:0px;
+	left: 0;
+	right: 0;
 	background:#E6E6E6;
-	border-top-width:3px;
-	border-top-style:solid;
-	border-top-color:#BDBDBD;
-	text-align:left;
-	padding:10px;
-	width:100%;
-	height: 80px;
+	border-top: 1px solid #999;
+	padding: 0px 0px;
+	height: 130px;
 }
+
+#wikiwayFooter #wikiwayTitle{
+	width: 100%;
+	height: 30px;
+	margin: 0px;
+	padding: 0px;
+}
+
+#wikiwayFooter #wikiwayTitle h1{
+	height: 30px;
+	line-height: 30px;
+	text-indent: 5px;
+	text-shadow: 0px 1px 0px #fff;
+	color: #333;
+	margin: 0px;
+	padding: 0px;
+	font-size: 18px;
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+}
+
+#wikiwayFooter #wikiwayUsers{
+	width: 30%;
+	height: 100px;
+	float: left;
+	background: #fff;
+	border-top: 1px solid #999;
+	border-bottom: 1px solid #999;
+	overflow-y: scroll;
+}
+
+#wikiwayFooter #wikiwayUsers ul{
+	margin: 0px;
+	padding: 0px;
+	list-style: none;
+	overflow: hidden;
+}
+
+#wikiwayFooter #wikiwayUsers li{
+	float: left;
+	width: 100%;
+	font-size: 13px;
+	height: 24px;
+	text-indent: 3px;
+	font-family: "Trebuchet MS", sans-serif;
+	overflow: hidden;
+	cursor: default;
+}
+
+#wikiwayFooter #wikiwayUsers li:hover{
+	text-shadow: 0px 1px 2px #999;
+}
+
+#wikiwayFooter #wikiwayChat{
+	width: 70%;
+	padding: 0px;
+	height: 100px;
+	float: left;
+}
+
+#wikiwayFooter #wikiwayChat #wikiwayChatContent{
+	height: 70px;
+	background: #fff;
+	border: 1px solid #999;
+	border-bottom: none;
+	box-shadow: inset 0 2px 5px #999;
+}
+
+#wikiwayFooter #wikiwayChat #wikiwayChatInput{
+	height: 29px;
+	border: 1px solid #999;
+	background: #fff;
+	overflow: hidden;
+}
+
+#wikiwayFooter #wikiwayChat #wikiwayChatInput #ChatText{
+	width: 80%;
+	height: 27px;
+	border: none;
+	background: #fff;
+	font-family: "Trebuchet MS", sans-serif;
+	font-size: 12px;
+	line-height: 28px;
+	text-indent: 4px;
+}
+#wikiwayFooter #wikiwayChat #wikiwayChatInput #ChatText:focus{
+	outline: none;
+}
+#wikiwayFooter #wikiwayChat #wikiwayChatInput #ChatButton{
+	float: right;
+	height: 24px;
+	margin: 2px;
+	border: 1px solid #999;
+	background: #ccc;
+	box-shadow: inset 0px 1px 0px #fff;
+	border-radius: 2px;
+	color: #333;
+	text-shadow: 0px 1px 0px #fff;
+}
+
+
+
+
+

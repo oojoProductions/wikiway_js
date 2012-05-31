@@ -12,7 +12,7 @@
 	});
 	
 	socket.on('updateUserInfo', function(data) {
-		$('#wikiwayFooter').html(data);
+		$('#wikiwayUsers').html(data);
 	});	
 	
 	//The server function to get the username frome user (block the ui, show a username form)

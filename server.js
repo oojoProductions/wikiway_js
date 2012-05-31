@@ -193,7 +193,7 @@ io.sockets.on('connection', function(client) {
     });
 });
 //Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals
-exports.broadcast = function(args) {
+function broadcast(args) {
 	//Message
 	if (typeof args.msg != 'undefined')
 	{
@@ -306,6 +306,10 @@ function renderUserInfo(client, callback){
 		}
 	});
 }
+
+// public functions
+exports.renderUserInfo = function(client, callback) {renderUserInfo(client, callback)};
+exports.broadcast = function(args) {broadcast(args)};
 
 //Start the whole thing
 server.listen(port);
