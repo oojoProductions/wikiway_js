@@ -69,6 +69,17 @@ io.sockets.on('connection', function(client) {
 	
 	//List all Games
 	client.on('listGames', function() {
+	
+		// update userlists with a empty clients array
+		var args = new Array();
+		args.channel = 'listGames';
+		args.template = 'userInfos';
+		args.clientfunction = 'updateUserPositions';
+		var locals = new Array();
+		locals.clients = new Array();
+		args.locals = locals;
+		broadcast(args);
+			
 		templ.render('listGames', {games: game.listGames(client)}, function (data){
 			client.emit('updateContent', data);
 		});
@@ -293,6 +304,10 @@ function refresh(client){
 		}
 	});
 };
+
+function clearFooter(){
+	
+}
 
 function getUserPositions(channel, callback){
 	var clients = new Array();
