@@ -69,17 +69,11 @@ io.sockets.on('connection', function(client) {
 	
 	//List all Games
 	client.on('listGames', function() {
-	
-		// update userlists with an empty clients array
-		var args = new Array();
-		args.channel = 'listGames';
-		args.template = 'userInfos';
-		args.clientfunction = 'updateUserPositions';
-		var locals = new Array();
-		locals.clients = new Array();
-		args.locals = locals;
-		broadcast(args);
-			
+		//clear Footer
+		clearFooter();
+		//Update footer title
+		updateFooterWikiwayTitle(client, function(data) {client.emit('updateFooterWikiwayTitle',data)});
+
 		templ.render('listGames', {games: game.listGames(client)}, function (data){
 			client.emit('updateContent', data);
 		});
@@ -109,6 +103,8 @@ io.sockets.on('connection', function(client) {
 	//Client joins game
 	client.on('joinGame', function(gameId) {
 		game.joinGame(client, gameId, function(){
+			//Update footer title
+			updateFooterWikiwayTitle(client, function(data) {client.emit('updateFooterWikiwayTitle',data)});
 			//Goto first article
 			game.next(client, null, function(started, win, gameId, args){
 				if (started == false)
@@ -337,11 +333,21 @@ function refresh(client){
 				client.emit('updateContent', data);
 			});
 		}
-	});	
+	});
+	//Update footer title
+	updateFooterWikiwayTitle(client, function(data) {client.emit('updateFooterWikiwayTitle',data)});
 };
 
 function clearFooter(){
-	
+	// update userlists with an empty clients array
+	var args = new Array();
+	args.channel = 'listGames';
+	args.template = 'userInfos';
+	args.clientfunction = 'updateUserPositions';
+	var locals = new Array();
+	locals.clients = new Array();
+	args.locals = locals;
+	broadcast(args);
 }
 
 function getUserPositions(channel, callback){
@@ -364,6 +370,16 @@ function getUserPositions(channel, callback){
 			});
 		}(clientsInGame[i]));
 	}
+}
+
+function updateFooterWikiwayTitle (client, callback) {
+	client.get('game', function(err, gameObject) {
+		if (gameObject == null){
+			callback('Kein Spiel!');
+		}else{
+			callback('Von '+gameObject.startArticle+' nach '+gameObject.endArticle);
+		}
+	});
 }
 
 // public functions

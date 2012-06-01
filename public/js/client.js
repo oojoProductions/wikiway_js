@@ -14,7 +14,11 @@
 	socket.on('updateUserPositions', function(data) {
 		$('#wikiwayUsers').html(data);
 	});
-	
+
+	socket.on('updateFooterWikiwayTitle', function(data) {
+		$('#wikiwayTitle h1').html(data);
+	});
+
 	socket.on('chatReceiver', function(username, message) {
 		$('#wikiwayChatContent').prepend('<b>'+username+':</b> '+message+'<br />');
 	});	
