@@ -15,6 +15,27 @@
 		$('#wikiwayUsers').html(data);
 	});
 	
+	socket.on('chatReceiver', function(username, message) {
+		$('#wikiwayChatContent').prepend('<b>'+username+':</b> '+message+'<br />');
+	});	
+	
+	//Chat function
+	
+	//Get Control over Submitbutton
+	$("#ChatButton").click(function(){
+		if($('#text-username').val() != ""){
+			socket.emit('chatSender', $('#ChatText').val());
+		}
+	});
+
+	//Get control over the enter key on the keyboard
+	$('#ChatText').keypress(function(e){
+		if(e.which == 13){
+			$("#ChatButton").click();
+		}
+	});
+	
+	
 	
 	//The server function to get the username frome user (block the ui, show a username form)
 	socket.on('getUsername', function(form) {
@@ -34,7 +55,7 @@
 			if(e.which == 13){
 				$("#getUsernameButton").click();
 			}
-		});		
+		});
 	});
 	
 	//The server function to unblock the username set form

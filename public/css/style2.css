@@ -101,11 +101,14 @@
 }
 
 #wikiwayFooter #wikiwayChat #wikiwayChatContent{
-	height: 70px;
+	height: 65px;
 	background: #fff;
 	border: 1px solid #999;
 	border-bottom: none;
 	box-shadow: inset 0 2px 5px #999;
+	overflow-y: scroll;
+	padding-left:5px;
+	padding-top:5px;
 }
 
 #wikiwayFooter #wikiwayChat #wikiwayChatInput{

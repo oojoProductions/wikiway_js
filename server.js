@@ -70,7 +70,7 @@ io.sockets.on('connection', function(client) {
 	//List all Games
 	client.on('listGames', function() {
 	
-		// update userlists with a empty clients array
+		// update userlists with an empty clients array
 		var args = new Array();
 		args.channel = 'listGames';
 		args.template = 'userInfos';
@@ -194,6 +194,32 @@ io.sockets.on('connection', function(client) {
 		refresh(client);
 	});
 	
+	//Chat
+	client.on('chatSender', function(message) {
+		//Check if user is in game
+		game.inGame(client, function (inGame){
+			if (inGame)
+			{
+				client.get('game', function(err, gameObject){
+					var args = new Array();
+					args.client = client;
+					args.chatmessage = message;
+					args.channel = gameObject.id;
+					broadcast(args);
+				});
+			}
+			else
+			{
+				var args = new Array();
+				args.client = client;
+				args.chatmessage = message;
+				args.channel = 'listGames';
+				broadcast(args);
+			}
+		});
+	});	
+	
+	
     client.on('disconnect', function() {
 		//-1 client
 		--clientCount;
@@ -203,8 +229,17 @@ io.sockets.on('connection', function(client) {
         console.log('client - disconnected');
     });
 });
-//Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals, clientfunction
+//Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals, clientfunction, chatmessage
 function broadcast(args) {
+	//Chat
+	if (typeof args.client != 'undefined' && typeof args.chatmessage != 'undefined' && typeof args.channel != 'undefined'){
+		args.client.get('username', function(err, username){
+			console.log('channel:'+args.channel);
+			io.sockets.in(args.channel).emit('chatReceiver', username, args.chatmessage);
+		});
+	}
+	
+
 	//Message
 	if (typeof args.msg != 'undefined')
 	{
@@ -302,7 +337,7 @@ function refresh(client){
 				client.emit('updateContent', data);
 			});
 		}
-	});
+	});	
 };
 
 function clearFooter(){
