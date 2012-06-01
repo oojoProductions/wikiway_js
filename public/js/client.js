@@ -11,7 +11,7 @@
 		initUserInputs();
 	});
 	
-	socket.on('updateUserInfo', function(data) {
+	socket.on('updateUserPositions', function(data) {
 		$('#wikiwayUsers').html(data);
 	});	
 	

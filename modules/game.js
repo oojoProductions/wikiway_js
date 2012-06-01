@@ -251,11 +251,18 @@ exports.next = function(client, articleId, callback){
 				server.broadcast({client: client, channel: gameObject.id, msg: username+' auf: '+tools.uriDecode(article)});
 			});
 			
-			//--- degbug ------
-			server.renderUserInfo(client, function(html){
-				client.broadcast.emit('updateUserInfo', html);
-			});
-			
+			// update userlists
+			server.getUserPositions(gameObject.id, function(clients){
+				var args = new Array();
+				args.channel = gameObject.id;
+				args.template = 'userInfos';
+				args.clientfunction = 'updateUserPositions';
+				var locals = new Array();
+				locals.clients = clients;
+				args.locals = locals;
+				server.broadcast(args);
+			});	
+				
 			//Save the whole thing in the user session
 			client.set('game', gameObject,function(){
 				args['bodycontent'] = bodycontent;

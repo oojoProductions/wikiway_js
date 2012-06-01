@@ -192,7 +192,7 @@ io.sockets.on('connection', function(client) {
         console.log('client - disconnected');
     });
 });
-//Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals
+//Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals, clientfunction
 function broadcast(args) {
 	//Message
 	if (typeof args.msg != 'undefined')
@@ -225,26 +225,32 @@ function broadcast(args) {
 	if (typeof args.template != 'undefined' && typeof args.locals != 'undefined')
 	{
 		templ.render(args.template, args.locals, function (data){
+			if(typeof args.clientfunction == 'undefined'){
+				args.clientfunction = 'updateContent';
+			}else{
+				args.clientfunction = args.clientfunction;
+			}
+			
 			if (typeof args.client == 'undefined')
 			{
 				if (typeof args.channel == 'undefined')
 				{
-					io.sockets.emit('updateContent', data);
+					io.sockets.emit(args.clientfunction, data);
 				}
 				else
 				{
-					io.sockets.in(args.channel).emit('updateContent', data);
+					io.sockets.in(args.channel).emit(args.clientfunction, data);
 				}
 			}
 			else
 			{
 				if (typeof args.channel == 'undefined')
 				{
-					args.client.broadcast.emit('updateContent', data);
+					args.client.broadcast.emit(args.clientfunction, data);
 				}
 				else
 				{
-					args.client.broadcast.in(args.channel).emit('updateContent', data);
+					args.client.broadcast.in(args.channel).emit(args.clientfunction, data);
 				}
 			}
 		});
@@ -263,11 +269,20 @@ function refresh(client){
 			game.next(client, null, function(win, bodycontent, gameId, args){
 				client.emit('updateContent', args.bodycontent);
 			});
-			
-			console.log('------- renderUserInfo------');
-			renderUserInfo(client, function(html){
-				client.emit('updateUserInfo', html);
-			});			
+
+			// update userlists
+			client.get('game', function(err, gameObject){
+				getUserPositions(gameObject.id, function(clients){
+					var args = new Array();
+					args.channel = gameObject.id;
+					args.template = 'userInfos';
+					args.clientfunction = 'updateUserPositions';
+					var locals = new Array();
+					locals.clients = clients;
+					args.locals = locals;
+					broadcast(args);
+				});
+			});
 		}
 		else
 		{
@@ -279,36 +294,30 @@ function refresh(client){
 	});
 };
 
-function renderUserInfo(client, callback){
+function getUserPositions(channel, callback){
 	var clients = new Array();
-	client.get('game', function(err, gameObject){
-		//Get all clients in gamechannel
-		var clientsInGame = io.sockets.clients(gameObject.id);
-		var startArticle = gameObject.startArticle;
-		var endArticle = gameObject.endArticle;
-	
-		//loop through all clients and update their content
-		for (i in clientsInGame)
-		{
-			//define anonym function and call it to keep client object even in a loop with asynchronus functions
-			(function(client) {
-				client.get('username', function(err, username){
-					client.get('game', function(err, gameObject){
-						var history = gameObject.history;
-						clients.push(new Array(username, history[history.length-1]));
-						//If user is not in game serve list of games
-						templ.render('userInfos', {clients: clients, startArticle: startArticle, endArticle: endArticle}, function (data){
-							callback(data);
-						});						
-					});
+	//Get all clients in gamechannel
+	var clientsInGame = io.sockets.clients(channel);
+	var clientsInGameLength = clientsInGame.length;
+	//loop through all clients and update their content
+	for (i in clientsInGame){
+		//define anonym function and call it to keep client object even in a loop with asynchronus functions
+		(function(client) {
+			client.get('username', function(err, username){
+				client.get('game', function(err, gameObject){
+					var history = gameObject.history;
+					clients.push(new Array(username, history[history.length-1]));
+					if(clients.length === clientsInGameLength){
+						callback(clients);
+					};
 				});
-			}(clientsInGame[i]));
-		}
-	});
+			});
+		}(clientsInGame[i]));
+	}
 }
 
 // public functions
-exports.renderUserInfo = function(client, callback) {renderUserInfo(client, callback)};
+exports.getUserPositions = function(channel, callback) {getUserPositions(channel, callback)};
 exports.broadcast = function(args) {broadcast(args)};
 
 //Start the whole thing
