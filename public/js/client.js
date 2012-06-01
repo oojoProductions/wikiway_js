@@ -29,6 +29,7 @@
 	$("#ChatButton").click(function(){
 		if($('#text-username').val() != ""){
 			socket.emit('chatSender', $('#ChatText').val());
+			$('#ChatText').val("");
 		}
 	});
 
