@@ -314,7 +314,7 @@ function getWikiContent(article, callback, trys){
 			for(var i=0; i<links.length; i++) {
 				var value = links[i];
 				var url = value.match("href=\"(.*?)\"");
-				bodycontent = bodycontent.replace(url[1], "#\" action=\"next\" art=\""+i);
+				bodycontent = bodycontent.replace(url[1], "javascript:void(0)\" action=\"next\" art=\""+i);
 			}
 
 			//Remove edit links
@@ -334,7 +334,7 @@ function getWikiContent(article, callback, trys){
 			{
 				for(var i=0; i<extlinks.length; i++) {
 					var extlink = extlinks[i];
-					if(!extlink.match('.*?href=".*?".*?load=.*?|.*?class="image".*?|.*?href="#.*?')){
+					if(!extlink.match('.*?href=".*?".*?load=.*?|.*?class="image".*?|.*?href="javascript.*?|.*?href="#.*?')){
 						var text = extlink.match(">(.*?)<");
 						bodycontent = bodycontent.replace(extlink, text[1]);
 					}

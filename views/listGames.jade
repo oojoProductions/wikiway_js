@@ -1,12 +1,12 @@
 h1 Liste der aktiven Spiele - 
-	a(href="#", action="newGame") Neues Spiel!
+	a(href="javascript:void(0)", action="newGame") Neues Spiel!
 - if (games.length)
 	- each game, i in games
-		a(href="#", action="joinGame", game="#{i}") Von #{game.startArticle} nach #{game.endArticle} - Spieler: #{game.clientCount}
+		a(href="javascript:void(0)", action="joinGame", game="#{i}") Von #{game.startArticle} nach #{game.endArticle} - Spieler: #{game.clientCount}
 		- if (game.started)
 			span - Spiel bereits gestartet!
 		br
 - else
 	p Keine aktiven Spiele! :(
 	br
-	a(href="#", action="newGame") Neues Spiel!
+	a(href="javascript:void(0)", action="newGame") Neues Spiel!

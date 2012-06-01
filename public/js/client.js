@@ -67,7 +67,9 @@
 		// Userinput methodes
 		//----------------------------------------
 		$("a").click(function(e){
-			e.preventDefault();
+			//If link is anchor just do it (R)
+			if($(this).attr("href").charAt(0) == "#") return true;
+			//Call game functions on server
 			switch($(this).attr("action")){
 				//List Games
 				case "listGames":
