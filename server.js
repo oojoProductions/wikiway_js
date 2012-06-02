@@ -13,8 +13,9 @@ var express = require('express'),
 require('./modules/object_watch').init();
 //Include main game functions
 var game = require('./modules/game.js');
-//Include template functions
-var templ = require('./modules/templ.js');
+//Include template functions and tools
+var templ = require('./modules/templ.js'),
+	tools = require('./modules/tools.js');
 
 //Port for Development
 var port = 1337;
@@ -81,6 +82,10 @@ io.sockets.on('connection', function(client) {
 	
 	//Client creates new game or show form if start and endarticle == null
 	client.on('newGame', function(startArticle, endArticle) {
+		//Escape Input
+		startArticle = tools.escape(startArticle);
+		endArticle = tools.escape(endArticle);
+		//Create Game
 		game.newGame(startArticle, endArticle, client, function(success){
 			if (success)
 			{
@@ -176,6 +181,9 @@ io.sockets.on('connection', function(client) {
 	});
 	//User can Set his name
 	client.on('setUsername', function(name){
+		//Escape Input
+		name = tools.escape(name);
+		//Set Username
 		client.set('username', name, function(){
 			client.emit('hideSetUsername');
 			client.emit('growl', 'Dein Username: '+name, 0);
@@ -192,6 +200,8 @@ io.sockets.on('connection', function(client) {
 	
 	//Chat
 	client.on('chatSender', function(message) {
+		//Escape Input
+		message = tools.escape(message);
 		//Check if user is in game
 		game.inGame(client, function (inGame){
 			if (inGame)

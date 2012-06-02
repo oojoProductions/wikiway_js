@@ -12,3 +12,7 @@ exports.uriEncode = function (unencoded) {
 exports.uriDecode = function (encoded) {
 	return decodeURIComponent(encoded.replace(/_/g, ' '));
 }
+
+exports.escape = function(unescaped) {
+	return unescaped.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+};
