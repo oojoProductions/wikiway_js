@@ -334,8 +334,8 @@ function getWikiContent(article, callback, trys){
 			{
 				for(var i=0; i<extlinks.length; i++) {
 					var extlink = extlinks[i];
-					if(!extlink.match('.*?href=".*?".*?load=.*?|.*?class="image".*?|.*?href="javascript.*?|.*?href="#.*?')){
-						var text = extlink.match(">(.*?)<");
+					if(!extlink.match('.*?href=".*?".*?load=.*?|.*?href="javascript.*?|.*?href="#.*?')){
+						var text = extlink.match(">(.*?)</a>");
 						bodycontent = bodycontent.replace(extlink, text[1]);
 					}
 				}
