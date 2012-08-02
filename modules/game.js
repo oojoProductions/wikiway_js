@@ -23,7 +23,7 @@ games[0]["clientCount"] = 0;
 games[0]["clients"] = new Array();
 games[0]["started"] = false;
 games[0]["won"] = false;
-games[0].watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
+games[0].watch('clientCount', function(obj, prop, oldVal, newVal) {return updateGameList(obj, prop, oldVal, newVal)});
 
 games[1] = new Object();
 games[1]["startArticle"] = "Aldi";
@@ -32,7 +32,7 @@ games[1]["clientCount"] = 0;
 games[1]["clients"] = new Array();
 games[1]["started"] = false;
 games[1]["won"] = false;
-games[1].watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
+games[1].watch('clientCount', function(obj, prop, oldVal, newVal) {return updateGameList(obj, prop, oldVal, newVal)});
 
 //Make New Game
 exports.newGame = function(startArticle, endArticle, client, callback){
@@ -87,7 +87,7 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 							}
 						);
 						//Monitor changes in clientCount to notify other clients
-						game.watch('clientCount', function(prop, oldVal, newVal) {return updateGameList(prop, oldVal, newVal)});
+						game.watch('clientCount', function(obj, prop, oldVal, newVal) {return updateGameList(obj, prop, oldVal, newVal)});
 						//Push to array
 						games.push(game);
 						//Call callback
@@ -279,6 +279,11 @@ function getArticleFromLinkArray(links, id){
 	article = article[1];
 	return article;
 }
+//Private function to get index of game
+function getIndexOfGame(game){
+	return games.indexOf(game);
+}
+
 //Private function get Wikipedia article
 function getWikiContent(article, callback, trys){
 	//Set trys back if not set
@@ -358,8 +363,14 @@ function getWikiContent(article, callback, trys){
 };
 
 //Functions for watched variables
-function updateGameList (prop, oldVal, newVal) {
-	console.log('game - '+prop+' changed from '+oldVal+' to '+newVal);
+function updateGameList (game, prop, oldVal, newVal) {
+	var id = getIndexOfGame(game);
+	console.log('game - ID:'+id+' '+prop+' changed from '+oldVal+' to '+newVal);
+	//Update Game List
 	server.broadcast({template: 'listGames', channel: 'listGames', locals: {games: games}});
+	//Update Waitingroom
+	if (!game.started){		
+		server.broadcast({template: 'waitingroom', channel: id, locals: {game: game, players: game.clients, gameId: id}});
+	}
 	return newVal;
 }

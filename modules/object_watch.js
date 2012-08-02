@@ -24,7 +24,7 @@ exports.init = function() {
 				}
 				, setter = function (val) {
 					oldval = newval;
-					return newval = handler.call(this, prop, oldval, val);
+					return newval = handler.call(this, this, prop, oldval, val);
 				}
 				;
 				
