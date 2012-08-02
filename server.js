@@ -7,8 +7,7 @@
 */
 
 //wikiway uses express and socket.io
-var express = require('express'),
-	socketio = require('socket.io');
+var express = require('express');
 //Extension for Object Prototype, now its possible to waatch changes in an object
 require('./modules/object_watch').init();
 //Include main game functions
@@ -28,14 +27,18 @@ if (arguments.length && !(isNaN(arguments[0])))
 }
 
 //Define Server
-var server = express.createServer();
-var io = socketio.listen(server);
+var app = express()
+  , http = require('http')
+  , server = http.createServer(app)
+  , io = require('socket.io').listen(server);
+
+server.listen(port);
 //Less log messages from socket.io
 io.set('log level', 1);
 //Serve files in public/ folder
-server.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public'));
 //Serve index
-server.get('/', function(req, res){
+app.get('/', function(req, res){
 	//Render index
 	templ.render('index', null, function (data){
 		res.send(data);
@@ -396,6 +399,4 @@ function updateFooterWikiwayTitle (client, callback) {
 exports.getUserPositions = function(channel, callback) {getUserPositions(channel, callback)};
 exports.broadcast = function(args) {broadcast(args)};
 
-//Start the whole thing
-server.listen(port);
 console.log('server - started on port '+port);
