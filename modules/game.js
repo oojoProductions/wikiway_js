@@ -128,20 +128,22 @@ exports.joinGame = function(client, gameId, callback){
 };
 
 //Leave Game
-exports.leaveGame = function(client){
+exports.leaveGame = function(client, callback){
 	client.get('game', function(err, gameObject){
 		if (!(gameObject == null))
-		{
+		{   
+			var id = gameObject.id;
 			//Delete username from list
 			client.get('username', function(err,data) {
-				games[gameObject.id]['clients'] = games[gameObject.id]['clients'].splice(games[gameObject.id]['clients'].indexOf(data),1);
+				games[id]['clients'].splice(games[id]['clients'].indexOf(data),1);
 			});
-			//--clientCount
-			--games[gameObject.id]['clientCount'];
-			//Leave Gamechannel
-			client.leave(gameObject.id);
+			//Change Channel
+			client.leave(id);
+			client.join('listGames');
+			//Update clientCount to notify others
+			--games[id]['clientCount'];
 			//Set Game null
-			client.set('game', null);
+			client.set('game', null, callback);
 		}
 	});
 
@@ -366,11 +368,11 @@ function getWikiContent(article, callback, trys){
 function updateGameList (game, prop, oldVal, newVal) {
 	var id = getIndexOfGame(game);
 	console.log('game - ID:'+id+' '+prop+' changed from '+oldVal+' to '+newVal);
-	//Update Game List
-	server.broadcast({template: 'listGames', channel: 'listGames', locals: {games: games}});
 	//Update Waitingroom
 	if (!game.started){		
 		server.broadcast({template: 'waitingroom', channel: id, locals: {game: game, players: game.clients, gameId: id}});
 	}
+	//Update Game List
+	server.broadcast({template: 'listGames', channel: 'listGames', locals: {games: games}});
 	return newVal;
 }

@@ -88,6 +88,10 @@
 				case "joinGame":
 					socket.emit('joinGame', $(this).attr("game"));
 					break;
+				//Leave Game
+				case "leaveGame":
+					socket.emit('leaveGame');
+					break;
 				//New Game
 				case "newGame":
 					socket.emit('newGame');

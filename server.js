@@ -132,7 +132,13 @@ io.sockets.on('connection', function(client) {
 			});
 		});
 	});
-
+	//Client leaves game
+	client.on('leaveGame', function() {
+		game.leaveGame(client, function() {
+			//Update footer title
+			updateFooterWikiwayTitle(client, function(data) {client.emit('updateFooterWikiwayTitle',data)});	
+		});
+	});
 	//Client can start game
 	client.on('startGame', function(gameId) {
 		if (gameId == null) return;
@@ -386,12 +392,10 @@ function getUserPositions(channel, callback){
 }
 
 function updateFooterWikiwayTitle (client, callback) {
-	client.get('game', function(err, gameObject) {
-		if (gameObject == null){
-			callback('Kein Spiel!');
-		}else{
-			callback('Von '+gameObject.startArticle+' nach '+gameObject.endArticle);
-		}
+	client.get('game', function(err, actGame) {
+		templ.render('footerTitle', {actGame: actGame}, function (data){
+			callback(data);
+		});
 	});
 }
 
