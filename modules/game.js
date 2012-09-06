@@ -6,7 +6,8 @@
 *	Datum:   11.05.2012
 */
 //Needs Request to work
-var request = require('request');
+var request = require('request'),
+	cache = require('memory-cache');
 
 //require server.js
 var server = require('./../server.js'),
@@ -14,6 +15,9 @@ var server = require('./../server.js'),
 
 //Array where all the Games are saved
 var games = new Array();
+
+//Time for Caching Wikipedia articles
+const CACHE_TIME = 5*60*1000; //ms
 
 //Fill Games array for debug
 games[0] = new Object();
@@ -290,6 +294,16 @@ function getIndexOfGame(game){
 function getWikiContent(article, callback, trys){
 	//Set trys back if not set
 	if (trys == null) trys = 1;
+
+	//get Cache
+	var cached = cache.get(article);
+	//If article already in cache get it from cache
+	if (cached != null){
+		callback(cached['bodycontent'], cached['links'], cached['title']);
+		console.log('cache - got '+article+' from cache');
+		return;
+	}
+
 	//options for request, User-Agent in header is important to not get blocked from wikipedia because of to many requests
 	var options = {
 		uri: 'http://de.wikipedia.org/wiki/'+article,
@@ -347,7 +361,17 @@ function getWikiContent(article, callback, trys){
 					}
 				}
 			}
-			
+			//Save Article in Cache
+			cache.put(
+				article,
+				{
+					bodycontent: bodycontent,
+					links: links,
+					title: title
+				},
+				CACHE_TIME
+			);
+			console.log('cache - put '+article+' to cache');
 			//Call callback with the content of wikipedia and the links array
 			callback(bodycontent, links, title);
 		}else{
