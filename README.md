@@ -2,7 +2,6 @@ wikiway_js
 ==========
 
 Demoserver:
-* http://jlo.li:443/ (Stable Version)
 * http://home.shebby.cc:443/ (Experimental Version)
 
 Planned Features:
