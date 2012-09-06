@@ -313,16 +313,15 @@ function getWikiContent(article, callback, trys){
 	request(options, function (error, response, body) {
 		//Is Page valid?
 		if (!error && response.statusCode == 200) {
-		
 			//grab contentdiv from wiki article
-			var regexContent = '<!-- bodyContent -->((.|\n|\r)*)<!-- /bodycontent -->';
+			var regexContent = '<!-- bodyContent -->[\\S\\s]*<!-- /bodyContent -->';
 			var bodycontent = body.match(regexContent);
-			bodycontent = bodycontent[1];
+			bodycontent = bodycontent[0];
 			
 			//grab titlediv from wiki article
-			var regexTitleBlock = '<!-- firstHeading -->((.|\n|\r)*)<!-- /firstHeading -->';
+			var regexTitleBlock = '<!-- firstHeading -->[\\S\\s]*<!-- /firstHeading -->';
 			var titleBlock = body.match(regexTitleBlock);
-			titleBlock = titleBlock[1];
+			titleBlock = titleBlock[0];
 			var regexTitle = new RegExp('<span dir="auto">(.*?)</span>');
 			var title = titleBlock.match(regexTitle);
 			title = title[1];
