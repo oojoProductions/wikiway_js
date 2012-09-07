@@ -12,7 +12,7 @@ var request = require('request'),
 //require server.js
 var server = require('./../server.js'),
 	tools = require('./tools.js'),
-	l = require('./tools.js');
+	l = require('./log.js');
 
 //Array where all the Games are saved
 var games = new Array();
