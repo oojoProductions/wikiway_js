@@ -9,7 +9,6 @@ Planned Features:
 * Better handling to find end article (check title instead of url)
 * full code review and shit - it's a big mess
 * Show all Routes from the other players
-* Cache for Wikipedia-Articles (only in RAM)
 * Badass Commander/ Admin Interface with Settings and Logs
 * Save Settings and Games
 * Bombs und other funky stuff
