@@ -11,7 +11,8 @@ var request = require('request'),
 
 //require server.js
 var server = require('./../server.js'),
-	tools = require('./tools.js');
+	tools = require('./tools.js'),
+	l = require('./tools.js');
 
 //Array where all the Games are saved
 var games = new Array();
@@ -61,7 +62,7 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 			if (response.statusCode != 200)
 			{
 				callback(false);
-				console.log('game - startarticle ('+startArticle+') not found');
+				l.log('game - startarticle ('+startArticle+') not found', l.WARN);
 				return;
 			}
 			else
@@ -72,13 +73,13 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 					if (response.statusCode != 200)
 					{
 						callback(false);
-						console.log('game - endarticle ('+endarticle+') not found');
+						l.log('game - endarticle ('+endarticle+') not found', l.WARN);
 						return;
 					}
 					else
 					{
 						//if everything is ok create game and fire callback
-						console.log('game - new game created: '+startArticle+' to ' +endArticle);
+						l.log('game - new game created: '+startArticle+' to ' +endArticle, l.SUCCESS);
 						game = new Object
 						(
 							{
@@ -155,7 +156,7 @@ exports.leaveGame = function(client, callback){
 
 //Start Game
 exports.startGame = function(gameId) {
-	console.log('game - start game with id: '+ gameId);
+	l.log('game - start game with id: '+ gameId);
 	games[gameId]['started'] = true;
 };
 
@@ -225,12 +226,12 @@ exports.next = function(client, articleId, callback){
 			}
 		}
 		//Logging
-		console.log('game - next article: '+article);
+		l.log('game - next article: '+article);
 		//Check if user wins the game
 		if (article === tools.uriEncode(games[gameObject.id].endArticle))
 		{
 			//Debug
-			console.log('game - end article found: '+article);
+			l.log('game - end article found: '+article, l.SUCCESS);
 			gameObject.history.push(tools.uriDecode(article));
 			//Define history as optional variable
 			args["history"] = gameObject.history;
@@ -300,7 +301,7 @@ function getWikiContent(article, callback, trys){
 	//If article already in cache get it from cache
 	if (cached != null){
 		callback(cached['bodycontent'], cached['links'], cached['title']);
-		console.log('cache - got '+article+' from cache');
+		l.log('cache - got '+article+' from cache');
 		return;
 	}
 
@@ -370,11 +371,11 @@ function getWikiContent(article, callback, trys){
 				},
 				CACHE_TIME
 			);
-			console.log('cache - put '+article+' to cache');
+			l.log('cache - put '+article+' to cache');
 			//Call callback with the content of wikipedia and the links array
 			callback(bodycontent, links, title);
 		}else{
-			console.log('game - failed to load wikipedia article: '+article+', Fehler: '+error+' Statuscode: '+response.statusCode+' Versuch: '+trys);
+			l.log('game - failed to load wikipedia article: '+article+', Fehler: '+error+' Statuscode: '+response.statusCode+' Versuch: '+trys, l.ERROR);
 			//Retry 5 times then call callback with no output
 			if (trys < 5){
 				getWikiContent(article, callback, trys + 1);
@@ -390,7 +391,7 @@ function getWikiContent(article, callback, trys){
 //Functions for watched variables
 function updateGameList (game, prop, oldVal, newVal) {
 	var id = getIndexOfGame(game);
-	console.log('game - ID:'+id+' '+prop+' changed from '+oldVal+' to '+newVal);
+	l.log('game - ID:'+id+' '+prop+' changed from '+oldVal+' to '+newVal);
 	//Update Waitingroom
 	if (!game.started){		
 		server.broadcast({template: 'waitingroom', channel: id, locals: {game: game, players: game.clients, gameId: id}});

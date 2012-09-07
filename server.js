@@ -14,7 +14,8 @@ require('./modules/object_watch').init();
 var game = require('./modules/game.js');
 //Include template functions and tools
 var templ = require('./modules/templ.js'),
-	tools = require('./modules/tools.js');
+	tools = require('./modules/tools.js'),
+	l = require('./modules/log.js');
 
 //Port for Development
 var port = 1337;
@@ -55,10 +56,9 @@ io.sockets.on('connection', function(client) {
 	//+1 client
 	++clientCount;
 	//log
-	console.log('client - connected');
+	l.log('client - connected', l.SUCCESS);
 	//Client loads Webpage
 	client.on('init', function() {
-		console.log('client - init from browser');
 		// refresh
 		refresh(client);
 		
@@ -197,7 +197,7 @@ io.sockets.on('connection', function(client) {
 			client.emit('hideSetUsername');
 			client.emit('growl', 'Dein Username: '+name, 0);
 			client.get('username', function(err, username){
-				console.log("server - set username: "+username);
+				l.log("server - set username: "+username);
 			});
 		});
 	});
@@ -241,7 +241,7 @@ io.sockets.on('connection', function(client) {
 		//Client should leave Game
 		game.leaveGame(client);
 		//log
-        console.log('client - disconnected');
+        l.log('client - disconnected', l.WARN);
     });
 });
 //Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals, clientfunction, chatmessage
@@ -249,7 +249,7 @@ function broadcast(args) {
 	//Chat
 	if (typeof args.client != 'undefined' && typeof args.chatmessage != 'undefined' && typeof args.channel != 'undefined'){
 		args.client.get('username', function(err, username){
-			console.log('channel:'+args.channel);
+			l.log('channel:'+args.channel);
 			io.sockets.in(args.channel).emit('chatReceiver', username, args.chatmessage);
 		});
 	}
@@ -403,4 +403,4 @@ function updateFooterWikiwayTitle (client, callback) {
 exports.getUserPositions = function(channel, callback) {getUserPositions(channel, callback)};
 exports.broadcast = function(args) {broadcast(args)};
 
-console.log('server - started on port '+port);
+l.log('server - started on port '+port, l.SUCCESS);
