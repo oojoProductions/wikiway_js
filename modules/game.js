@@ -73,7 +73,7 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 					if (response.statusCode != 200)
 					{
 						callback(false);
-						l.log('game - endarticle ('+endarticle+') not found', l.WARN);
+						l.log('game - endarticle ('+endArticle+') not found', l.WARN);
 						return;
 					}
 					else
