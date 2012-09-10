@@ -404,3 +404,11 @@ exports.getUserPositions = function(channel, callback) {getUserPositions(channel
 exports.broadcast = function(args) {broadcast(args)};
 
 l.log('server - started on port '+port, l.SUCCESS);
+
+//ugly uncaught exeption handling
+process.on('uncaughtException', function(err) {
+  l.log('uncaught exeption', l.ERROR);
+  console.log('--------------------------------------');
+  console.log(err.stack);
+  console.log('--------------------------------------');
+});
