@@ -132,6 +132,32 @@ exports.joinGame = function(client, gameId, callback){
 	}
 };
 
+//Freeze Game so the user gets not disturbed
+exports.freezeGame = function(client){
+	client.get('game', function(err, gameObject){
+		if (!(gameObject == null))
+		{   
+			var id = gameObject.id;
+			//Change Channel
+			client.leave(id);
+			client.join(id+'-frozen');
+		}
+	});
+};
+
+//Unfreeze Game
+exports.unfreezeGame = function(client){
+	client.get('game', function(err, gameObject){
+		if (!(gameObject == null))
+		{   
+			var id = gameObject.id;
+			//Change Channel
+			client.leave(id+'-frozen');
+			client.join(id);
+		}
+	});
+};
+
 //Leave Game
 exports.leaveGame = function(client, callback){
 	client.get('game', function(err, gameObject){
@@ -144,6 +170,7 @@ exports.leaveGame = function(client, callback){
 			});
 			//Change Channel
 			client.leave(id);
+			client.leave(id+'-frozen');
 			client.join('listGames');
 			//Update clientCount to notify others
 			--games[id]['clientCount'];

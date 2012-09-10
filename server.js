@@ -176,7 +176,7 @@ io.sockets.on('connection', function(client) {
 						var clientsInGame = io.sockets.clients(gameId);
 						for (i in clientsInGame)
 						{
-							game.leaveGame(clientsInGame[i]);
+							game.freezeGame(clientsInGame[i]);
 						}
 					});
 				});
