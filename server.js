@@ -56,7 +56,7 @@ io.sockets.on('connection', function(client) {
 	//+1 client
 	++clientCount;
 	//log
-	l.log('client - connected', l.SUCCESS);
+	l.log('client - connected, IP:'+client.handshake.address.address, l.SUCCESS);
 	//Client loads Webpage
 	client.on('init', function() {
 		// refresh
@@ -241,7 +241,7 @@ io.sockets.on('connection', function(client) {
 		//Client should leave Game
 		game.leaveGame(client);
 		//log
-        l.log('client - disconnected', l.WARN);
+        l.log('client - disconnected, IP:'+client.handshake.address.address, l.WARN);
     });
 });
 //Server Broadcast a message or data. args: client, msg, msgType, channel, template, locals, clientfunction, chatmessage
