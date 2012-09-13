@@ -20,24 +20,34 @@ var games = new Array();
 //Time for Caching Wikipedia articles
 const CACHE_TIME = 5*60*1000; //ms
 
-//Fill Games array for debug
-games[0] = new Object();
-games[0]["startArticle"] = "Coop";
-games[0]["endArticle"] = "Migros";
-games[0]["clientCount"] = 0;
-games[0]["clients"] = new Array();
-games[0]["started"] = false;
-games[0]["won"] = false;
-games[0].watch('clientCount', function(obj, prop, oldVal, newVal) {return updateGameList(obj, prop, oldVal, newVal)});
+//Object Game
+function Game(startArticle, endArticle){
+	this.startArticle = startArticle;
+	this.endArticle = endArticle;
+	//--
+	this.clientCount = 0;
+	this.clients = new Array();
+	this.started = false;
+	this.won = false;
+	//Watch changes of clientcount
+	this.watch('clientCount', function(obj, prop, oldVal, newVal) {
+		return updateGameList(obj, prop, oldVal, newVal)
+	});
+};
+//Object UserSaveGame
+function UserSaveGame(startArticle, endArticle, id)
+{
+	this.startArticle = startArticle;
+	this.endArticle = endArticle;
+	this.id = id;
+	//--
+	this.history = new Array();
+	this.links = new Array();
+};
 
-games[1] = new Object();
-games[1]["startArticle"] = "Aldi";
-games[1]["endArticle"] = "Lidl";
-games[1]["clientCount"] = 0;
-games[1]["clients"] = new Array();
-games[1]["started"] = false;
-games[1]["won"] = false;
-games[1].watch('clientCount', function(obj, prop, oldVal, newVal) {return updateGameList(obj, prop, oldVal, newVal)});
+//Fill Games array for debug
+games.push(new Game('Coop', 'Migros'));
+games.push(new Game('Aldi', 'Lidl'));
 
 //Make New Game
 exports.newGame = function(startArticle, endArticle, client, callback){
@@ -46,8 +56,7 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 	//General checks
 	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "" || startArticle == endArticle)
 	{
-		callback(false);
-		return;
+		return callback(false);
 	}
 	else
 	{
@@ -61,9 +70,8 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 		request(options, function(error, response, body){
 			if (response.statusCode != 200)
 			{
-				callback(false);
 				l.log('game - startarticle ('+startArticle+') not found', l.WARN);
-				return;
+				return callback(false);
 			}
 			else
 			{
@@ -72,31 +80,16 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 				request(options, function(error, response, body){
 					if (response.statusCode != 200)
 					{
-						callback(false);
 						l.log('game - endarticle ('+endArticle+') not found', l.WARN);
-						return;
+						return callback(false);
 					}
 					else
 					{
 						//if everything is ok create game and fire callback
+						games.push(new Game(startArticle, endArticle));
 						l.log('game - new game created: '+startArticle+' to ' +endArticle, l.SUCCESS);
-						game = new Object
-						(
-							{
-								startArticle: startArticle,
-								endArticle: endArticle,
-								clientCount: 0,
-								clients: new Array(),
-								started: false,
-								won: false,
-							}
-						);
-						//Monitor changes in clientCount to notify other clients
-						game.watch('clientCount', function(obj, prop, oldVal, newVal) {return updateGameList(obj, prop, oldVal, newVal)});
-						//Push to array
-						games.push(game);
 						//Call callback
-						callback(true);
+						return callback(true);
 					}
 				});
 			}
@@ -118,26 +111,21 @@ exports.joinGame = function(client, gameId, callback){
 		//++clientCount
 		++games[gameId]['clientCount'];
 		//Create Game Object for User
-		gameObject = new Object();
-		gameObject['id'] = gameId;
-		gameObject['history'] = Array();
-		gameObject['links'] = Array();
-		gameObject['startArticle'] = games[gameId].startArticle;
-		gameObject['endArticle'] = games[gameId].endArticle;
+		var userSaveGame = new UserSaveGame(games[gameId].startArticle, games[gameId].endArticle, gameId);
 		//Client joins socket.io room for game and leaves room listGames
 		client.leave('listGames');
 		client.join(gameId);
 		//Set game object
-		client.set('game', gameObject, callback);
+		client.set('game', userSaveGame, callback);
 	}
 };
 
 //Freeze Game so the user gets not disturbed
 exports.freezeGame = function(client){
-	client.get('game', function(err, gameObject){
-		if (!(gameObject == null))
+	client.get('game', function(err, userSaveGame){
+		if (!(userSaveGame == null))
 		{   
-			var id = gameObject.id;
+			var id = userSaveGame.id;
 			//Change Channel
 			client.leave(id);
 			client.join(id+'-frozen');
@@ -147,10 +135,10 @@ exports.freezeGame = function(client){
 
 //Unfreeze Game
 exports.unfreezeGame = function(client){
-	client.get('game', function(err, gameObject){
-		if (!(gameObject == null))
+	client.get('game', function(err, userSaveGame){
+		if (!(userSaveGame == null))
 		{   
-			var id = gameObject.id;
+			var id = userSaveGame.id;
 			//Change Channel
 			client.leave(id+'-frozen');
 			client.join(id);
@@ -160,10 +148,10 @@ exports.unfreezeGame = function(client){
 
 //Leave Game
 exports.leaveGame = function(client, callback){
-	client.get('game', function(err, gameObject){
-		if (!(gameObject == null))
+	client.get('game', function(err, userSaveGame){
+		if (!(userSaveGame == null))
 		{   
-			var id = gameObject.id;
+			var id = userSaveGame.id;
 			//Delete username from list
 			client.get('username', function(err,data) {
 				games[id]['clients'].splice(games[id]['clients'].indexOf(data),1);
@@ -204,8 +192,8 @@ exports.getGame = function(gameId){
 
 //Checks if user is in Game
 exports.inGame = function(client, callback){
-	client.get('game', function(err, gameObject){
-		if (gameObject == null)
+	client.get('game', function(err, userSaveGame){
+		if (userSaveGame == null)
 		{
 			callback(false);
 		}
@@ -221,52 +209,51 @@ exports.next = function(client, articleId, callback){
 	//Array with optional variables for callback
 	var args = new Array();
 	//Get User specific stuff
-	client.get('game', function(err, gameObject){
+	client.get('game', function(err, userSaveGame){
 		//Output all players in game
-		args['players'] = games[gameObject.id]['clients'];
+		args['players'] = games[userSaveGame.id]['clients'];
 		//Check if user is in game, if not do nothing
-		if (gameObject == null) return;
+		if (userSaveGame == null) return;
 		//
-		if (!(games[gameObject.id].started))
+		if (!(games[userSaveGame.id].started))
 		{
-			args['game'] = games[gameObject.id];
-			callback(false, false, gameObject.id, args);
-			return;
+			args['game'] = games[userSaveGame.id];
+			return callback(false, false, userSaveGame.id, args);
 		}
 		//Get next Article
 		var article;
-		if (gameObject.links && articleId != null)
+		if (userSaveGame.links && articleId != null)
 		{
 			//Normal case, gets article from link array
-			article = getArticleFromLinkArray(gameObject.links, articleId);
+			article = getArticleFromLinkArray(userSaveGame.links, articleId);
 		}
 		else
 		{
 			//Use startArticle if there is no history (user is new in game)
-			if (gameObject.history.length)
+			if (userSaveGame.history.length)
 			{
-				article = tools.uriEncode(gameObject.history[gameObject.history.length-1]);
+				article = tools.uriEncode(userSaveGame.history[userSaveGame.history.length-1]);
 			}
 			else
 			{
-				article = tools.uriEncode(games[gameObject.id].startArticle);
+				article = tools.uriEncode(games[userSaveGame.id].startArticle);
 			}
 		}
 		//Logging
 		l.log('game - next article: '+article);
 		//Check if user wins the game
-		if (article === tools.uriEncode(games[gameObject.id].endArticle))
+		if (article === tools.uriEncode(games[userSaveGame.id].endArticle))
 		{
 			//Debug
 			l.log('game - end article found: '+article, l.SUCCESS);
-			gameObject.history.push(tools.uriDecode(article));
+			userSaveGame.history.push(tools.uriDecode(article));
 			//Define history as optional variable
-			args["history"] = gameObject.history;
+			args["history"] = userSaveGame.history;
 			//Get client username
 			client.get('username', function(err, username){
 				//Define username as optional variable
 				args["username"] = username;
-				callback(true, true, gameObject.id, args);
+				callback(true, true, userSaveGame.id, args);
 			});
 			return;
 		}
@@ -277,18 +264,18 @@ exports.next = function(client, articleId, callback){
 			//ad title to bodycontent (very ugly -> jade template)
 			bodycontent = '<h1 class="firstHeading">'+title+'</h1>'+bodycontent;
 			//Set Links to use Later
-			gameObject.links = links;
+			userSaveGame.links = links;
 			//Set Article History
-			gameObject.history.push(tools.uriDecode(article));
+			userSaveGame.history.push(tools.uriDecode(article));
 			//inform all players in game about article (debug)
 			client.get('username', function(err, username) {
-				server.broadcast({client: client, channel: gameObject.id, msg: username+' auf: '+tools.uriDecode(article)});
+				server.broadcast({client: client, channel: userSaveGame.id, msg: username+' auf: '+tools.uriDecode(article)});
 			});
 			
 			// update userlists
-			server.getUserPositions(gameObject.id, function(clients){
+			server.getUserPositions(userSaveGame.id, function(clients){
 				var args = new Array();
-				args.channel = gameObject.id;
+				args.channel = userSaveGame.id;
 				args.template = 'userInfos';
 				args.clientfunction = 'updateUserPositions';
 				var locals = new Array();
@@ -298,9 +285,9 @@ exports.next = function(client, articleId, callback){
 			});	
 				
 			//Save the whole thing in the user session
-			client.set('game', gameObject,function(){
+			client.set('game', userSaveGame,function(){
 				args['bodycontent'] = bodycontent;
-				callback(true, false, gameObject.id, args);
+				callback(true, false, userSaveGame.id, args);
 			});
 		});
 	});
@@ -327,9 +314,8 @@ function getWikiContent(article, callback, trys){
 	var cached = cache.get(article);
 	//If article already in cache get it from cache
 	if (cached != null){
-		callback(cached['bodycontent'], cached['links'], cached['title']);
 		l.log('cache - got '+article+' from cache');
-		return;
+		return callback(cached['bodycontent'], cached['links'], cached['title']);
 	}
 
 	//options for request, User-Agent in header is important to not get blocked from wikipedia because of to many requests
@@ -400,7 +386,7 @@ function getWikiContent(article, callback, trys){
 			);
 			l.log('cache - put '+article+' to cache');
 			//Call callback with the content of wikipedia and the links array
-			callback(bodycontent, links, title);
+			return callback(bodycontent, links, title);
 		}else{
 			l.log('game - failed to load wikipedia article: '+article+', Fehler: '+error+' Statuscode: '+response.statusCode+' Versuch: '+trys, l.ERROR);
 			//Retry 5 times then call callback with no output
@@ -409,7 +395,7 @@ function getWikiContent(article, callback, trys){
 			}
 			else
 			{
-				callback(null, null, null);
+				return callback(null, null, null);
 			}
 		}
 	});
