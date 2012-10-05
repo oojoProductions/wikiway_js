@@ -25,9 +25,7 @@ exports.log = function (text, loglevel) {
 	if (loglevel == 2) output = 'W|';
 	if (loglevel == 3) output = 'E|';
 	if (loglevel == 4) output = 'I|';
-	//Zusätzliche nullen
-	var 
-	//Date
+	//Custom Date String
 	output = output +
 		d.getFullYear() +
 		'-' + pad(d.getMonth(), 2) +
@@ -35,6 +33,7 @@ exports.log = function (text, loglevel) {
 		'|' + pad(d.getHours(), 2) +
 		':' + pad(d.getMinutes(), 2) +
 		':' + pad(d.getMilliseconds(), 3);
+	//Logtext
 	output = output + '|' + text;
 	//output in nice colors :)
 	if (loglevel == 1) output = console.log(output);
