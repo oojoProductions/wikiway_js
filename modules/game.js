@@ -55,46 +55,36 @@ exports.newGame = function(startArticle, endArticle, client, callback){
 	client.leave('listGames');
 	//General checks
 	if (startArticle == null || endArticle == null || startArticle == "" || endArticle == "" || startArticle == endArticle)
-	{
 		return callback(false);
-	}
-	else
-	{
-		//request options; only load head
-		var options = {
-			uri: 'http://de.wikipedia.org/wiki/'+tools.uriEncode(startArticle),
-			method: "HEAD",
-			headers: {'User-Agent': 'wikiway_js'}
-		};
-		//check if startArticle exists
-		request(options, function(error, response, body){
-			if (response.statusCode != 200)
-			{
-				l.log('game - startarticle ('+startArticle+') not found', l.WARN);
-				return callback(false);
-			}
-			else
-			{
-				options.uri = 'http://de.wikipedia.org/wiki/'+tools.uriEncode(endArticle);
-				//check if endArticle exists
-				request(options, function(error, response, body){
-					if (response.statusCode != 200)
-					{
-						l.log('game - endarticle ('+endArticle+') not found', l.WARN);
-						return callback(false);
-					}
-					else
-					{
-						//if everything is ok create game and fire callback
-						games.push(new Game(startArticle, endArticle));
-						l.log('game - new game created: '+startArticle+' to ' +endArticle, l.SUCCESS);
-						//Call callback
-						return callback(true);
-					}
-				});
-			}
+
+	//request options; only load head
+	var options = {
+		uri: 'http://de.wikipedia.org/wiki/'+tools.uriEncode(startArticle),
+		method: "HEAD",
+		headers: {'User-Agent': 'wikiway_js'}
+	};
+	//check if startArticle exists
+	request(options, function(error, response, body){
+		if (response.statusCode != 200)
+		{
+			l.log('game - startarticle ('+startArticle+') not found', l.WARN);
+			return callback(false);
+		}
+		//Get titel for endarticle
+		getWikiContent(tools.uriEncode(endArticle), function(bodycontent, links, title){
+			//Check if Article exists
+			if (title == null) {
+				l.log('game - endarticle ('+endArticle+') not found', l.WARN);
+				return callback(false)
+			};
+			//if everything is ok create game and fire callback
+			games.push(new Game(startArticle, title));
+			l.log('game - new game created: '+startArticle+' to ' + title + ' ('+endArticle + ')', l.SUCCESS);
+			//Call callback
+			return callback(true);
 		});
-	}
+	});
+
 };
 
 //Join Game
@@ -229,47 +219,38 @@ exports.next = function(client, articleId, callback){
 		}
 		else
 		{
-			//Use startArticle if there is no history (user is new in game)
-			if (userSaveGame.history.length)
-			{
-				article = tools.uriEncode(userSaveGame.history[userSaveGame.history.length-1]);
-			}
-			else
-			{
-				article = tools.uriEncode(games[userSaveGame.id].startArticle);
-			}
+			//Goto Startarticle
+			article = tools.uriEncode(games[userSaveGame.id].startArticle);
 		}
 		//Logging
 		l.log('game - next article: '+article);
-		//Check if user wins the game
-		if (article === tools.uriEncode(games[userSaveGame.id].endArticle))
-		{
-			//Debug
-			l.log('game - end article found: '+article, l.SUCCESS);
-			userSaveGame.history.push(tools.uriDecode(article));
-			//Define history as optional variable
-			args["history"] = userSaveGame.history;
-			//Get client username
-			client.get('username', function(err, username){
-				//Define username as optional variable
-				args["username"] = username;
-				callback(true, true, userSaveGame.id, args);
-			});
-			return;
-		}
 		//Get requested article from Wikipedia
 		getWikiContent(article, function(bodycontent, links, title){
 			//if article could not load do nothing
 			if(bodycontent==null) return;
+			//Fill history
+			userSaveGame.history.push(title);
+			//Check if user wins the game
+			if (title === games[userSaveGame.id].endArticle)
+			{
+				//Logging
+				l.log('game - end article found: '+title, l.SUCCESS);
+				//Get client username
+				client.get('username', function(err, username){
+					//History and winner for game over screen
+					args["username"] = username;
+					args["history"] = userSaveGame.history;
+					return callback(true, true, userSaveGame.id, args);
+				});
+				return;
+			}
 			//ad title to bodycontent (very ugly -> jade template)
 			bodycontent = '<h1 class="firstHeading">'+title+'</h1>'+bodycontent;
 			//Set Links to use Later
 			userSaveGame.links = links;
-			//Set Article History
-			userSaveGame.history.push(tools.uriDecode(article));
 			//inform all players in game about article (debug)
 			client.get('username', function(err, username) {
-				server.broadcast({client: client, channel: userSaveGame.id, msg: username+' auf: '+tools.uriDecode(article)});
+				server.broadcast({client: client, channel: userSaveGame.id, msg: username+' auf: '+title});
 			});
 			
 			// update userlists
