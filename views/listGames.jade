@@ -1,11 +1,23 @@
+link(rel="stylesheet", href="./css/myTable.css", type="text/css", media="all")
+
 h1 Liste der aktiven Spiele - 
 	a(href="javascript:void(0)", action="newGame") Neues Spiel!
 - if (games.length)
-	- each game, i in games
-		a(href="javascript:void(0)", action="joinGame", game="#{i}") Von #{game.startArticle} nach #{game.endArticle} - Spieler: #{game.clientCount}
-		- if (game.started)
-			span - Spiel bereits gestartet!
-		br
+	div.myTable
+		div.tableHead
+			span.s1 Von
+			span.s2 Nach
+			span.s3 Spieler
+			span.s4 Gestartet
+		- each game, i in games
+			a(href="javascript:void(0)", action="joinGame", game="#{i}")
+				span.s1 #{game.startArticle}
+				span.s2 #{game.endArticle}
+				span.s3 #{game.clientCount}
+				- if (game.started)
+					span.s4 Ja
+				- else
+					span.s4 Nein
 - else
 	p Keine aktiven Spiele! :(
 	br

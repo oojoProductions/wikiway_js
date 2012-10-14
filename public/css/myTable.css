@@ -1,0 +1,32 @@
+.myTable {
+  display: table;
+}
+.myTable .tableHead{
+  display: table-row;
+  font-weight: bold;
+}
+.myTable a {
+  display: table-row;
+  text-decoration: none;
+  color: black;
+}
+.myTable a:hover {
+  background-color: white;
+}
+.myTable span {
+  display: table-cell;
+  padding: 5px;
+}
+.myTable .s1 {
+  width: 100px;
+}
+.myTable .s2 {
+  width: 100px;
+}
+.myTable .s3 {
+  text-align: right;
+  width: 40px;
+}
+.myTable .s4 {
+  width: 40px;
+}
