@@ -9,6 +9,7 @@
 		$('#wikiwayContent').html(data);
 		$('html, body').scrollTop('0');
 		initUserInputs();
+		$.unblockUI();
 	});
 	
 	socket.on('updateUserPositions', function(data) {
@@ -83,6 +84,7 @@
 				//Enter Game
 				case "startGame":
 					socket.emit('startGame', $(this).attr("game"));
+					$.blockUI({message: '<img src="/img/loading.gif" /><h3>Lade...</h3>'});
 					break;
 				//Enter Game
 				case "joinGame":
@@ -98,6 +100,7 @@
 					break;
 				case "next":
 					socket.emit('next', $(this).attr("art"));
+					$.blockUI({message: '<img src="/img/loading.gif" /><h3>Lade...</h3>'});
 					break;
 			}
 		});
