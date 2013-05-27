@@ -95,10 +95,10 @@ class WikiwayServer
 				# load first article
 				@gameController.next client, null, (started, win, gameId, args) ->
 					if started
+						client.emit 'updateContent', args.bodycontent
+					else
 						r 'waitingroom', {game: args.game, players: args.players, gameId: gameId}, (data) ->
 							client.emit 'updateContent', data
-					else
-						client.emit 'updateContent', args.bodycontent
 				# update game list for others - NEEDED?
 				r 'listGames', {games: @gameController.listGames()}, (data) ->
 					io.sockets.in('listGames').emit 'updateContent', data

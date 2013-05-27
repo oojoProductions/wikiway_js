@@ -204,13 +204,14 @@ class GameController
 	# TODO nicer method to update
 	updateGameList: (game, prop, oldVal, newVal) ->
 		id = @getGameIndex game
-		@server.broadcast 
-			template: 'waitingroom'
-			channel: id
-			locals:
-				game: game
-				players: game.clients
-				gameId: id
+		unless game.started
+			@server.broadcast 
+				template: 'waitingroom'
+				channel: id
+				locals:
+					game: game
+					players: game.clients
+					gameId: id
 		@server.broadcast
 			template: 'listGames'
 			channel: 'listGames',
