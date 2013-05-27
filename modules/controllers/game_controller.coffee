@@ -100,23 +100,24 @@ class GameController
 		callback if userSaveGame? then true else false
 
 	next: (client, articleId, callback) ->
-		args = new Array()
+		args = {}
 		await client.get 'game', defer(err, userSaveGame)
 		return unless userSaveGame?
+		game = games[userSaveGame.id]
 		args.players = games[userSaveGame.id].clients
-		unless games[userSaveGame.id].started
-			args.game = games[userSaveGame.id]
+		unless game.started
+			args.game = game
 			return callback false, false, userSaveGame.id, args
 		# get next article or startarticle
 		if userSaveGame.links? and articleId?
 			article = @getArticleFromLinkArray userSaveGame.links, articleId # next article
 		else
-			article = tools.uriEncode games[userSaveGame.id].startArticle # start article
+			article = tools.uriEncode game.startArticle # start article
 		l.log 'game - get next article: '+article
 		await @getWikiContent article, defer(bodycontent, links, title)
 		return unless bodycontent?
 		userSaveGame.history.push title
-		if title == games[userSaveGame.id].endArticle
+		if title == game.endArticle
 			l.log 'game - end article found: '+title, l.SUCCESS
 			await client.get 'username', defer(err, username)
 			args.username = username; args.history = userSaveGame.history

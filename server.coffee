@@ -130,7 +130,7 @@ class WikiwayServer
 						for clientInGame in io.sockets.clients gameId
 							@gameController.freezeGame clientInGame
 				else
-					client.emit 'updateContent', args['bodycontent']
+					client.emit 'updateContent', args.bodycontent
 
 			# set username
 			client.on 'setUsername', (name) =>
